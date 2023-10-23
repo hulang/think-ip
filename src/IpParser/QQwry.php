@@ -140,7 +140,7 @@ class QQwry implements IpParserInterface
             // 当上边界小于下边界时，查找失败
             $i = floor(($l + $u) / 2);
             // 计算近似中间记录
-            fseek($this->fp, $this->firstIp + $i * 7);
+            fseek($this->fp, intval($this->firstIp + $i) * 7);
             $beginip = strrev(fread($this->fp, 4));
             // 获取中间记录的开始IP地址
             // strrev函数在这里的作用是将little-endian的压缩IP地址转化为big-endian的格式
