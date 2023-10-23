@@ -9,7 +9,7 @@ class StringParser
     /**
      * 运营商词典
      *
-     * @var array
+     * @var mixed|array
      */
     private static $dictIsp = [
         '联通',
@@ -23,7 +23,7 @@ class StringParser
     /**
      * 中国直辖市
      *
-     * @var array
+     * @var mixed|array
      */
     private static $dictCityDirectly = [
         '北京',
@@ -40,7 +40,7 @@ class StringParser
     /**
      * 中国省份
      *
-     * @var array
+     * @var mixed|array
      */
     private static $dictProvince = [
         '北京',
@@ -87,7 +87,7 @@ class StringParser
      *
      * @param $location
      * @param bool $withOriginal debug 用，是否返回原始数据
-     * @return array
+     * @return mixed|array
      */
     public static function parse($location, $withOriginal = false)
     {
@@ -104,12 +104,12 @@ class StringParser
             return $result;
         }
 
-        //ipv6 会包含中国 故意去掉
+        // ipv6 会包含中国 故意去掉
 
         if (strpos($location['country'], '中国') === 0) {
             $location['country'] = str_replace('中国', '', $location['country']);
         }
-        //北京市朝阳区
+        // 北京市朝阳区
         $location['org_country'] = $location['country'];
         // 金桥国际小区
         $location['org_area'] = $location['area'];
@@ -117,11 +117,11 @@ class StringParser
         $location['province'] = $location['city'] = $location['county'] = '';
 
         $_tmp_province = explode($separatorProvince, $location['country']);
-        //存在 省 标志 xxx省yyyy 中的yyyy
+        // 存在 省 标志 xxx省yyyy 中的yyyy
         if (isset($_tmp_province[1])) {
             $isChina = true;
-            //省
-            $location['province'] = $_tmp_province[0]; //河北
+            // 省
+            $location['province'] = $_tmp_province[0]; // 河北
 
             if (strpos($_tmp_province[1], $separatorCity) !== false) {
                 $_tmp_city = explode($separatorCity, $_tmp_province[1]);
@@ -244,7 +244,7 @@ class StringParser
 
     /**
      * @param $str
-     * @return string
+     * @return mixed|string
      */
     private static function getIsp($str)
     {
