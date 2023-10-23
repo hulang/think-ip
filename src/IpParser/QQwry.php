@@ -10,7 +10,6 @@ namespace think\Ip\IpParser;
  */
 class QQwry implements IpParserInterface
 {
-
     public function setDBPath($filePath)
     {
         $this->filePath = $filePath;
@@ -18,7 +17,7 @@ class QQwry implements IpParserInterface
 
     /**
      * @param $ip
-     * @return array
+     * @return mixed|array
      */
     public function getIp($ip)
     {
@@ -40,13 +39,13 @@ class QQwry implements IpParserInterface
 
     /**
      * 文件路径
-     * @var string
+     * @var mixed|string
      */
     private $filePath;
     /**
      * qqwry.dat文件指针
      *
-     * @var resource
+     * @var mixed|resource
      */
     private $fp;
     /**
@@ -58,13 +57,13 @@ class QQwry implements IpParserInterface
     /**
      * 最后一条IP记录的偏移地址
      *
-     * @var int
+     * @var mixed|int
      */
     private $lastIp;
     /**
      * IP记录的总条数（不包含版本信息记录）
      *
-     * @var int
+     * @var mixed|int
      */
     private $totalIp;
 
@@ -79,7 +78,7 @@ class QQwry implements IpParserInterface
      * </code>
      *
      * @param $ip
-     * @return array
+     * @return mixed|array
      */
     public function getAddr($ip)
     {
@@ -118,7 +117,7 @@ class QQwry implements IpParserInterface
      *
      * @access public
      * @param string $ip
-     * @return array ip country area beginip endip
+     * @return mixed|array ip country area beginip endip
      */
     private function getLocation($ip)
     {
@@ -224,7 +223,7 @@ class QQwry implements IpParserInterface
      *
      * @access private
      * @param string $ip
-     * @return string
+     * @return mixed|string
      */
     private function packIp($ip)
     {
@@ -239,7 +238,7 @@ class QQwry implements IpParserInterface
      * 133.205.0.0 ==>> 2244804608
      *
      * @param string $ip 要转换的 ip 地址
-     * @return int 转换完成的数字
+     * @return mixed|int 转换完成的数字
      */
     private function ip2long($ip)
     {
@@ -252,7 +251,7 @@ class QQwry implements IpParserInterface
      * 返回读取的3个字节的长整型数
      *
      * @access private
-     * @return int
+     * @return mixed|int
      */
     private function getLong3()
     {
@@ -266,7 +265,7 @@ class QQwry implements IpParserInterface
      *
      * @access private
      * @param string $data
-     * @return string
+     * @return mixed|string
      */
     private function getString($data = '')
     {
@@ -284,7 +283,7 @@ class QQwry implements IpParserInterface
      * 返回地区信息
      *
      * @access private
-     * @return string
+     * @return mixed|string
      */
     private function getArea()
     {
