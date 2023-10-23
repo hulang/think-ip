@@ -31,7 +31,7 @@ class IpLocation
      * @param $ip
      * @param string $ipV4Path
      * @param string $ipV6Path
-     * @return array
+     * @return mixed|array
      */
     public static function getLocationWithoutParse($ip, $ipV4Path = '', $ipV6Path = '')
     {
@@ -67,7 +67,7 @@ class IpLocation
      * @param $ip
      * @param string $ipV4Path
      * @param string $ipV6Path
-     * @return array|mixed
+     * @return mixed|array
      */
     public static function getLocation($ip, $ipV4Path = '', $ipV6Path = '')
     {
@@ -95,7 +95,7 @@ class IpLocation
     }
 
     /**
-     * @return string
+     * @return mixed|string
      */
     private static function getIpV4Path()
     {
@@ -103,7 +103,7 @@ class IpLocation
     }
 
     /**
-     * @return string
+     * @return mixed|string
      */
     private static function getIpV6Path()
     {
@@ -112,7 +112,7 @@ class IpLocation
 
     /**
      * @param $ip
-     * @return bool
+     * @return mixed|bool
      */
     private static function isIpV4($ip)
     {
@@ -121,7 +121,7 @@ class IpLocation
 
     /**
      * @param $ip
-     * @return bool
+     * @return mixed|bool
      */
     private static function isIpV6($ip)
     {
@@ -130,7 +130,7 @@ class IpLocation
 
     /**
      * @param $filename
-     * @return string
+     * @return mixed|string
      */
     public static function src($filename)
     {
@@ -139,7 +139,7 @@ class IpLocation
 
     /**
      * @param $filename
-     * @return string
+     * @return mixed|string
      */
     public static function root($filename)
     {
