@@ -1,7 +1,6 @@
 ### 环境
 
 - php >= 7.2.5
-- ThinkPHP >=6.1
 - 修改自(https://github.com/itbdw/ip-database)
 
 ## 安装
