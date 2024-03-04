@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace think\Ip;
+namespace hulang\Ip;
 
-use think\Ip\IpParser\QQwry;
-use think\Ip\IpParser\IpV6wry;
+use itbdw\Ip\IpParser\QQwry;
+use itbdw\Ip\IpParser\IpV6wry;
 
 /**
  *
@@ -14,7 +14,7 @@ define('IP_DATABASE_ROOT_DIR', dirname(__DIR__));
 
 /**
  * Class IpLocation
- * @package think\Ip
+ * @package itbdw\Ip
  */
 class IpLocation
 {
@@ -31,17 +31,17 @@ class IpLocation
      * @param $ip
      * @param string $ipV4Path
      * @param string $ipV6Path
-     * @return mixed|array
+     * @return array
      */
     public static function getLocationWithoutParse($ip, $ipV4Path = '', $ipV6Path = '')
     {
 
-        // if ipV4Path 记录位置
+        // if  ipV4Path 记录位置
         if (strlen($ipV4Path)) {
             self::setIpV4Path($ipV4Path);
         }
 
-        // if ipV6Path 记录位置
+        // if  ipV6Path 记录位置
         if (strlen($ipV6Path)) {
             self::setIpV6Path($ipV6Path);
         }
@@ -67,7 +67,7 @@ class IpLocation
      * @param $ip
      * @param string $ipV4Path
      * @param string $ipV6Path
-     * @return mixed|array
+     * @return array|mixed
      */
     public static function getLocation($ip, $ipV4Path = '', $ipV6Path = '')
     {
@@ -95,7 +95,7 @@ class IpLocation
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
     private static function getIpV4Path()
     {
@@ -103,7 +103,7 @@ class IpLocation
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
     private static function getIpV6Path()
     {
@@ -112,7 +112,7 @@ class IpLocation
 
     /**
      * @param $ip
-     * @return mixed|bool
+     * @return bool
      */
     private static function isIpV4($ip)
     {
@@ -121,7 +121,7 @@ class IpLocation
 
     /**
      * @param $ip
-     * @return mixed|bool
+     * @return bool
      */
     private static function isIpV6($ip)
     {
@@ -130,7 +130,7 @@ class IpLocation
 
     /**
      * @param $filename
-     * @return mixed|string
+     * @return string
      */
     public static function src($filename)
     {
@@ -139,7 +139,7 @@ class IpLocation
 
     /**
      * @param $filename
-     * @return mixed|string
+     * @return string
      */
     public static function root($filename)
     {

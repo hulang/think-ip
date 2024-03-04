@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace think\Ip;
+namespace hulang\Ip;
 
 class StringParser
 {
     /**
      * 运营商词典
      *
-     * @var mixed|array
+     * @var array
      */
     private static $dictIsp = [
         '联通',
@@ -23,7 +23,7 @@ class StringParser
     /**
      * 中国直辖市
      *
-     * @var mixed|array
+     * @var array
      */
     private static $dictCityDirectly = [
         '北京',
@@ -40,7 +40,7 @@ class StringParser
     /**
      * 中国省份
      *
-     * @var mixed|array
+     * @var array
      */
     private static $dictProvince = [
         '北京',
@@ -87,7 +87,7 @@ class StringParser
      *
      * @param $location
      * @param bool $withOriginal debug 用，是否返回原始数据
-     * @return mixed|array
+     * @return array
      */
     public static function parse($location, $withOriginal = false)
     {
@@ -109,10 +109,10 @@ class StringParser
         if (strpos($location['country'], '中国') === 0) {
             $location['country'] = str_replace('中国', '', $location['country']);
         }
-        // 北京市朝阳区
-        $location['org_country'] = $location['country'];
-        // 金桥国际小区
-        $location['org_area'] = $location['area'];
+
+        $location['org_country'] = $location['country']; //北京市朝阳区
+
+        $location['org_area'] = $location['area']; // 金桥国际小区
 
         $location['province'] = $location['city'] = $location['county'] = '';
 
@@ -192,7 +192,7 @@ class StringParser
 
                         // 内蒙古 类型的 获取市县信息
                         if (strpos($_tmp_city, $separatorCity) !== false) {
-                            // 市
+                            //市
                             $_tmp_city = explode($separatorCity, $_tmp_city);
 
                             $location['city'] = $_tmp_city[0] . $separatorCity;
@@ -222,20 +222,19 @@ class StringParser
             $location['country'] = '中国';
         }
 
+        $result['ip'] = $location['ip'];
 
-        $result['ip'] = trim($location['ip']);
-
-        $result['country'] = trim($location['country']);
-        $result['province'] = trim($location['province']);
-        $result['city'] = trim($location['city']);
-        $result['county'] = trim($location['county']);
+        $result['country'] = $location['country'];
+        $result['province'] = $location['province'];
+        $result['city'] = $location['city'];
+        $result['county'] = $location['county'];
 
         $result['area'] = $location['country'] . $location['province'] . $location['city'] . $location['county'] . ' ' . $location['org_area'];
 
-        $result['isp'] = trim(self::getIsp($result['area']));
+        $result['isp'] = self::getIsp($result['area']);
 
         if ($withOriginal) {
-            $result['org'] = trim($org);
+            $result['org'] = $org;
         }
 
         return $result;
@@ -244,7 +243,7 @@ class StringParser
 
     /**
      * @param $str
-     * @return mixed|string
+     * @return string
      */
     private static function getIsp($str)
     {

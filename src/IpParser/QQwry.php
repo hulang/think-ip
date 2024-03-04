@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace think\Ip\IpParser;
+namespace hulang\Ip\IpParser;
 
 /**
  * Class IpV4
- * @package think\Ip
+ * @package itbdw\Ip
  */
 class QQwry implements IpParserInterface
 {
+
     public function setDBPath($filePath)
     {
         $this->filePath = $filePath;
@@ -17,7 +18,7 @@ class QQwry implements IpParserInterface
 
     /**
      * @param $ip
-     * @return mixed|array
+     * @return array
      */
     public function getIp($ip)
     {
@@ -39,13 +40,13 @@ class QQwry implements IpParserInterface
 
     /**
      * 文件路径
-     * @var mixed|string
+     * @var string
      */
     private $filePath;
     /**
      * qqwry.dat文件指针
      *
-     * @var mixed|resource
+     * @var resource
      */
     private $fp;
     /**
@@ -57,13 +58,13 @@ class QQwry implements IpParserInterface
     /**
      * 最后一条IP记录的偏移地址
      *
-     * @var mixed|int
+     * @var int
      */
     private $lastIp;
     /**
      * IP记录的总条数（不包含版本信息记录）
      *
-     * @var mixed|int
+     * @var int
      */
     private $totalIp;
 
@@ -78,7 +79,7 @@ class QQwry implements IpParserInterface
      * </code>
      *
      * @param $ip
-     * @return mixed|array
+     * @return array
      */
     public function getAddr($ip)
     {
@@ -117,7 +118,7 @@ class QQwry implements IpParserInterface
      *
      * @access public
      * @param string $ip
-     * @return mixed|array ip country area beginip endip
+     * @return array ip country area beginip endip
      */
     private function getLocation($ip)
     {
@@ -140,7 +141,7 @@ class QQwry implements IpParserInterface
             // 当上边界小于下边界时，查找失败
             $i = floor(($l + $u) / 2);
             // 计算近似中间记录
-            fseek($this->fp, intval($this->firstIp + $i) * 7);
+            fseek($this->fp, $this->firstIp + $i * 7);
             $beginip = strrev(fread($this->fp, 4));
             // 获取中间记录的开始IP地址
             // strrev函数在这里的作用是将little-endian的压缩IP地址转化为big-endian的格式
@@ -165,7 +166,7 @@ class QQwry implements IpParserInterface
                 }
             }
         }
-        //获取查找到的IP地理位置信息
+        // 获取查找到的IP地理位置信息
         fseek($this->fp, $findip);
         $location['beginip'] = long2ip($this->getLong());
         // 用户IP所在范围的开始地址
@@ -223,7 +224,7 @@ class QQwry implements IpParserInterface
      *
      * @access private
      * @param string $ip
-     * @return mixed|string
+     * @return string
      */
     private function packIp($ip)
     {
@@ -238,7 +239,7 @@ class QQwry implements IpParserInterface
      * 133.205.0.0 ==>> 2244804608
      *
      * @param string $ip 要转换的 ip 地址
-     * @return mixed|int 转换完成的数字
+     * @return int    转换完成的数字
      */
     private function ip2long($ip)
     {
@@ -251,7 +252,7 @@ class QQwry implements IpParserInterface
      * 返回读取的3个字节的长整型数
      *
      * @access private
-     * @return mixed|int
+     * @return int
      */
     private function getLong3()
     {
@@ -265,7 +266,7 @@ class QQwry implements IpParserInterface
      *
      * @access private
      * @param string $data
-     * @return mixed|string
+     * @return string
      */
     private function getString($data = '')
     {
@@ -283,7 +284,7 @@ class QQwry implements IpParserInterface
      * 返回地区信息
      *
      * @access private
-     * @return mixed|string
+     * @return string
      */
     private function getArea()
     {
