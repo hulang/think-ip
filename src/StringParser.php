@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace hulang\Ip;
+namespace think\Ip;
 
 class StringParser
 {
     /**
      * 运营商词典
      *
-     * @var array
+     * @var mixed|array
      */
     private static $dictIsp = [
         '联通',
@@ -23,7 +23,7 @@ class StringParser
     /**
      * 中国直辖市
      *
-     * @var array
+     * @var mixed|array
      */
     private static $dictCityDirectly = [
         '北京',
@@ -40,7 +40,7 @@ class StringParser
     /**
      * 中国省份
      *
-     * @var array
+     * @var mixed|array
      */
     private static $dictProvince = [
         '北京',
@@ -87,7 +87,7 @@ class StringParser
      *
      * @param $location
      * @param bool $withOriginal debug 用，是否返回原始数据
-     * @return array
+     * @return mixed|array
      */
     public static function parse($location, $withOriginal = false)
     {
@@ -121,7 +121,7 @@ class StringParser
         if (isset($_tmp_province[1])) {
             $isChina = true;
             // 省
-            $location['province'] = $_tmp_province[0]; // 河北
+            $location['province'] = $_tmp_province[0]; //河北
 
             if (strpos($_tmp_province[1], $separatorCity) !== false) {
                 $_tmp_city = explode($separatorCity, $_tmp_province[1]);
@@ -168,7 +168,7 @@ class StringParser
                                 // 解决 休息休息校区 变成城市区域
                                 $isHitBlackTail = false;
                                 foreach (self::$dictDistrictBlackTails as $blackTail) {
-                                    // 尾
+                                    //尾
                                     if (mb_substr($_tmp_qu[0], -mb_strlen($blackTail)) == $blackTail) {
                                         $isHitBlackTail = true;
                                         break;
@@ -177,7 +177,7 @@ class StringParser
 
                                 // 校区，学区
                                 if ((!$isHitBlackTail) && mb_strlen($_tmp_qu[0]) < 5) {
-                                    //有点尴尬
+                                    // 有点尴尬
                                     $location['city'] = $_tmp_qu[0] . $separatorDistrict;
                                 }
                             }
@@ -192,7 +192,7 @@ class StringParser
 
                         // 内蒙古 类型的 获取市县信息
                         if (strpos($_tmp_city, $separatorCity) !== false) {
-                            //市
+                            // 市
                             $_tmp_city = explode($separatorCity, $_tmp_city);
 
                             $location['city'] = $_tmp_city[0] . $separatorCity;
@@ -212,7 +212,6 @@ class StringParser
                             }
                         }
                     }
-
                     break;
                 }
             }
@@ -223,7 +222,6 @@ class StringParser
         }
 
         $result['ip'] = $location['ip'];
-
         $result['country'] = $location['country'];
         $result['province'] = $location['province'];
         $result['city'] = $location['city'];
@@ -243,7 +241,7 @@ class StringParser
 
     /**
      * @param $str
-     * @return string
+     * @return mixed|string
      */
     private static function getIsp($str)
     {

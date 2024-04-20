@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace hulang\Ip\IpParser;
+namespace think\Ip\IpParser;
 
 /**
  * Class IpV6wry
- * @package itbdw\Ip
+ * @package think\Ip
  */
 class IpV6wry implements IpParserInterface
 {
@@ -17,7 +17,7 @@ class IpV6wry implements IpParserInterface
 
     /**
      * @param $ip
-     * @return array
+     * @return mixed|array
      */
     public function getIp($ip)
     {
@@ -51,7 +51,7 @@ class IpV6wry implements IpParserInterface
 
     /**
      * return database record count
-     * @return int|string
+     * @return mixed|int|string
      */
     public static function total()
     {
@@ -85,16 +85,16 @@ class IpV6wry implements IpParserInterface
     /**
      * query ipv6
      * @param $ip
-     * @return array
+     * @return mixed|array
      */
     public static function query($ip)
     {
         $ip_bin = inet_pton($ip);
         if (false === $ip_bin) {
-            throw new \RuntimeException("error IPv6 address: $ip");
+            throw new \RuntimeException('error IPv6 address: ' . $ip);
         }
         if (16 !== strlen($ip_bin)) {
-            throw new \RuntimeException("error IPv6 address: $ip");
+            throw new \RuntimeException('error IPv6 address: ' . $ip);
         }
         $fd = fopen(static::$filePath, 'rb');
         static::initialize($fd);
@@ -125,7 +125,7 @@ class IpV6wry implements IpParserInterface
      * 读取记录
      * @param $fd
      * @param $offset
-     * @return string[]
+     * @return mixed|string|array
      */
     public static function read_record($fd, $offset)
     {
@@ -148,7 +148,7 @@ class IpV6wry implements IpParserInterface
      * 读取地区
      * @param $fd
      * @param $offset
-     * @return string
+     * @return mixed|string
      */
     public static function read_location($fd, $offset)
     {

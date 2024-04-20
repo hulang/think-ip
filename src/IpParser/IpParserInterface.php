@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace hulang\Ip\IpParser;
+namespace think\Ip\IpParser;
 
 interface IpParserInterface
 {

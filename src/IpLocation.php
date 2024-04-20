@@ -2,19 +2,16 @@
 
 declare(strict_types=1);
 
-namespace hulang\Ip;
+namespace think\Ip;
 
-use itbdw\Ip\IpParser\QQwry;
-use itbdw\Ip\IpParser\IpV6wry;
+use think\Ip\IpParser\QQwry;
+use think\Ip\IpParser\IpV6wry;
 
-/**
- *
- */
 define('IP_DATABASE_ROOT_DIR', dirname(__DIR__));
 
 /**
  * Class IpLocation
- * @package itbdw\Ip
+ * @package think\Ip
  */
 class IpLocation
 {
@@ -31,17 +28,17 @@ class IpLocation
      * @param $ip
      * @param string $ipV4Path
      * @param string $ipV6Path
-     * @return array
+     * @return mixed|array
      */
     public static function getLocationWithoutParse($ip, $ipV4Path = '', $ipV6Path = '')
     {
 
-        // if  ipV4Path 记录位置
+        // ipV4Path 记录位置
         if (strlen($ipV4Path)) {
             self::setIpV4Path($ipV4Path);
         }
 
-        // if  ipV6Path 记录位置
+        // ipV6Path 记录位置
         if (strlen($ipV6Path)) {
             self::setIpV6Path($ipV6Path);
         }
@@ -67,7 +64,7 @@ class IpLocation
      * @param $ip
      * @param string $ipV4Path
      * @param string $ipV6Path
-     * @return array|mixed
+     * @return mixed|array
      */
     public static function getLocation($ip, $ipV4Path = '', $ipV6Path = '')
     {
@@ -95,7 +92,7 @@ class IpLocation
     }
 
     /**
-     * @return string
+     * @return mixed|string
      */
     private static function getIpV4Path()
     {
@@ -103,7 +100,7 @@ class IpLocation
     }
 
     /**
-     * @return string
+     * @return mixed|string
      */
     private static function getIpV6Path()
     {
@@ -112,7 +109,7 @@ class IpLocation
 
     /**
      * @param $ip
-     * @return bool
+     * @return mixed|bool
      */
     private static function isIpV4($ip)
     {
@@ -121,7 +118,7 @@ class IpLocation
 
     /**
      * @param $ip
-     * @return bool
+     * @return mixed|bool
      */
     private static function isIpV6($ip)
     {
@@ -130,7 +127,7 @@ class IpLocation
 
     /**
      * @param $filename
-     * @return string
+     * @return mixed|string
      */
     public static function src($filename)
     {
@@ -139,7 +136,7 @@ class IpLocation
 
     /**
      * @param $filename
-     * @return string
+     * @return mixed|string
      */
     public static function root($filename)
     {
