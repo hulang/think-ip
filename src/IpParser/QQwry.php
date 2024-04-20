@@ -10,12 +10,10 @@ namespace think\Ip\IpParser;
  */
 class QQwry implements IpParserInterface
 {
-
     public function setDBPath($filePath)
     {
         $this->filePath = $filePath;
     }
-
     /**
      * @param $ip
      * @return mixed|array
@@ -29,7 +27,6 @@ class QQwry implements IpParserInterface
                 'error' => $exception->getMessage(),
             ];
         }
-
         $return = [
             'ip' => $ip,
             'country' => $tmp['country'],
@@ -37,7 +34,6 @@ class QQwry implements IpParserInterface
         ];
         return $return;
     }
-
     /**
      * 文件路径
      * @var mixed|string
@@ -67,8 +63,6 @@ class QQwry implements IpParserInterface
      * @var mixed|int
      */
     private $totalIp;
-
-
     /**
      * 如果ip错误
      * <code>
@@ -99,7 +93,6 @@ class QQwry implements IpParserInterface
         $location = $this->getLocation($ip);
         return $location;
     }
-
     /**
      * 返回读取的长整型数
      *
@@ -112,7 +105,6 @@ class QQwry implements IpParserInterface
         $result = unpack('Vlong', fread($this->fp, 4));
         return $result['long'];
     }
-
     /**
      * 根据所给 IP 地址或域名返回所在地区信息
      *
@@ -218,7 +210,6 @@ class QQwry implements IpParserInterface
         }
         return $location;
     }
-
     /**
      * 返回压缩后可进行比较的IP地址
      *
@@ -232,7 +223,6 @@ class QQwry implements IpParserInterface
         // 这时intval将Flase转化为整数-1，之后压缩成big-endian编码的字符串
         return pack('N', intval($this->ip2long($ip)));
     }
-
     /**
      * Ip 地址转为数字地址
      * php 的 ip2long 这个函数有问题
@@ -247,7 +237,6 @@ class QQwry implements IpParserInterface
         $iplong = (16777216 * intval($ip_arr[0])) + (65536 * intval($ip_arr[1])) + (256 * intval($ip_arr[2])) + intval($ip_arr[3]);
         return $iplong;
     }
-
     /**
      * 返回读取的3个字节的长整型数
      *
@@ -260,7 +249,6 @@ class QQwry implements IpParserInterface
         $result = unpack('Vlong', fread($this->fp, 3) . chr(0));
         return $result['long'];
     }
-
     /**
      * 返回读取的字符串
      *
@@ -279,7 +267,6 @@ class QQwry implements IpParserInterface
         }
         return $data;
     }
-
     /**
      * 返回地区信息
      *
@@ -305,7 +292,6 @@ class QQwry implements IpParserInterface
         }
         return $area;
     }
-
     /**
      * 析构函数，用于在页面执行结束后自动关闭打开的文件。
      */

@@ -23,7 +23,6 @@ class IpLocation
      * @var
      */
     private static $ipV6Path;
-
     /**
      * @param $ip
      * @param string $ipV4Path
@@ -32,17 +31,14 @@ class IpLocation
      */
     public static function getLocationWithoutParse($ip, $ipV4Path = '', $ipV6Path = '')
     {
-
         // ipV4Path 记录位置
         if (strlen($ipV4Path)) {
             self::setIpV4Path($ipV4Path);
         }
-
         // ipV6Path 记录位置
         if (strlen($ipV6Path)) {
             self::setIpV6Path($ipV6Path);
         }
-
         if (self::isIpV4($ip)) {
             $ins = new QQwry();
             $ins->setDBPath(self::getIpV4Path());
@@ -56,10 +52,8 @@ class IpLocation
                 'error' => 'IP Invalid'
             ];
         }
-
         return $location;
     }
-
     /**
      * @param $ip
      * @param string $ipV4Path
@@ -74,7 +68,6 @@ class IpLocation
         }
         return StringParser::parse($location);
     }
-
     /**
      * @param $path
      */
@@ -82,7 +75,6 @@ class IpLocation
     {
         self::$ipV4Path = $path;
     }
-
     /**
      * @param $path
      */
@@ -90,7 +82,6 @@ class IpLocation
     {
         self::$ipV6Path = $path;
     }
-
     /**
      * @return mixed|string
      */
@@ -98,7 +89,6 @@ class IpLocation
     {
         return self::$ipV4Path ?: self::src('/libs/qqwry.dat');
     }
-
     /**
      * @return mixed|string
      */
@@ -106,7 +96,6 @@ class IpLocation
     {
         return self::$ipV6Path ?: self::src('/libs/ipv6wry.db');
     }
-
     /**
      * @param $ip
      * @return mixed|bool
@@ -115,7 +104,6 @@ class IpLocation
     {
         return false !== filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
     }
-
     /**
      * @param $ip
      * @return mixed|bool
@@ -124,7 +112,6 @@ class IpLocation
     {
         return false !== filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
     }
-
     /**
      * @param $filename
      * @return mixed|string
@@ -133,7 +120,6 @@ class IpLocation
     {
         return self::root('/src' . $filename);
     }
-
     /**
      * @param $filename
      * @return mixed|string

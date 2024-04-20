@@ -14,7 +14,6 @@ class IpV6wry implements IpParserInterface
     {
         self::$filePath = $filePath;
     }
-
     /**
      * @param $ip
      * @return mixed|array
@@ -28,7 +27,6 @@ class IpV6wry implements IpParserInterface
                 'error' => $exception->getMessage(),
             ];
         }
-
         $return = [
             'ip' => $ip,
             'country' => $tmp['addr'][0],
@@ -36,10 +34,7 @@ class IpV6wry implements IpParserInterface
         ];
         return $return;
     }
-
-
     private static $filePath;
-
     const FORMAT = 'J2';
     private static $total = null;
     // 索引区
@@ -48,7 +43,6 @@ class IpV6wry implements IpParserInterface
     private static $offlen;
     private static $iplen;
     private static $has_initialized = false;
-
     /**
      * return database record count
      * @return mixed|int|string
@@ -62,7 +56,6 @@ class IpV6wry implements IpParserInterface
         }
         return static::$total;
     }
-
     public static function initialize($fd)
     {
         if (!static::$has_initialized) {
@@ -81,7 +74,6 @@ class IpV6wry implements IpParserInterface
             static::$has_initialized = true;
         }
     }
-
     /**
      * query ipv6
      * @param $ip
@@ -120,7 +112,6 @@ class IpV6wry implements IpParserInterface
         }
         return ['start' => $ip_start, 'end' => $ip_end, 'addr' => $ip_addr, 'disp' => $ip_addr_disp];
     }
-
     /**
      * 读取记录
      * @param $fd
@@ -143,7 +134,6 @@ class IpV6wry implements IpParserInterface
         }
         return $record;
     }
-
     /**
      * 读取地区
      * @param $fd
@@ -167,7 +157,6 @@ class IpV6wry implements IpParserInterface
         }
         return static::readstr($fd, $offset);
     }
-
     /**
      * 查找 ip 所在的索引
      * @param $fd
@@ -183,20 +172,14 @@ class IpV6wry implements IpParserInterface
             return $l;
         }
         $m = intval(($l + $r) / 2);
-        $m_ip1 = static::read8(
-            $fd,
-            static::$index_start_offset + $m * (static::$iplen + static::$offlen),
-            static::$iplen
-        );
+        // 
+        $offset_q1 = static::$index_start_offset + $m * (static::$iplen + static::$offlen);
+        $m_ip1 = static::read8($fd, $offset_q1, static::$iplen);
         $m_ip2 = 0;
         if (static::$iplen <= 8) {
             $m_ip1 <<= 8 * (8 - static::$iplen);
         } else {
-            $m_ip2 = static::read8(
-                $fd,
-                static::$index_start_offset + $m * (static::$iplen + static::$offlen) + 8,
-                static::$iplen - 8
-            );
+            $m_ip2 = static::read8($fd, $offset_q1 + 8, static::$iplen - 8);
             $m_ip2 <<= 8 * (16 - static::$iplen);
         }
         if (static::uint64cmp($ip_num1, $m_ip1) < 0) {
@@ -210,7 +193,6 @@ class IpV6wry implements IpParserInterface
         }
         return static::find($fd, $ip_num1, $ip_num2, $m, $r);
     }
-
     public static function readraw($fd, $offset = null, $size = 0)
     {
         if (!is_null($offset)) {
@@ -218,7 +200,6 @@ class IpV6wry implements IpParserInterface
         }
         return fread($fd, $size);
     }
-
     public static function read1($fd, $offset = null)
     {
         if (!is_null($offset)) {
@@ -227,7 +208,6 @@ class IpV6wry implements IpParserInterface
         $a = fread($fd, 1);
         return @unpack('C', $a)[1];
     }
-
     public static function read8($fd, $offset = null, $size = 8)
     {
         if (!is_null($offset)) {
@@ -236,7 +216,6 @@ class IpV6wry implements IpParserInterface
         $a = fread($fd, $size) . '\0\0\0\0\0\0\0\0';
         return @unpack('P', $a)[1];
     }
-
     public static function readstr($fd, $offset = null)
     {
         if (!is_null($offset)) {
@@ -251,12 +230,10 @@ class IpV6wry implements IpParserInterface
         }
         return $str;
     }
-
     public static function ip2num($ip)
     {
         return unpack('N', inet_pton($ip))[1];
     }
-
     public static function inet_ntoa($nip)
     {
         $ip = [];
@@ -268,7 +245,6 @@ class IpV6wry implements IpParserInterface
         $ip[] = $nip;
         return join('.', $ip);
     }
-
     public static function uint64cmp($a, $b)
     {
         if ($a >= 0 && $b >= 0 || $a < 0 && $b < 0) {
