@@ -172,14 +172,13 @@ class IpV6wry implements IpParserInterface
             return $l;
         }
         $m = intval(($l + $r) / 2);
-        // 
-        $offset_q1 = static::$index_start_offset + $m * (static::$iplen + static::$offlen);
-        $m_ip1 = static::read8($fd, $offset_q1, static::$iplen);
+        $offset = static::$index_start_offset + $m * (static::$iplen + static::$offlen);
+        $m_ip1 = static::read8($fd, $offset, static::$iplen);
         $m_ip2 = 0;
         if (static::$iplen <= 8) {
             $m_ip1 <<= 8 * (8 - static::$iplen);
         } else {
-            $m_ip2 = static::read8($fd, $offset_q1 + 8, static::$iplen - 8);
+            $m_ip2 = static::read8($fd, $offset + 8, static::$iplen - 8);
             $m_ip2 <<= 8 * (16 - static::$iplen);
         }
         if (static::uint64cmp($ip_num1, $m_ip1) < 0) {
@@ -206,22 +205,22 @@ class IpV6wry implements IpParserInterface
             fseek($fd, $offset);
         }
         $a = fread($fd, 1);
-        return @unpack('C', $a)[1];
+        return @unpack("C", $a)[1];
     }
     public static function read8($fd, $offset = null, $size = 8)
     {
         if (!is_null($offset)) {
             fseek($fd, $offset);
         }
-        $a = fread($fd, $size) . '\0\0\0\0\0\0\0\0';
-        return @unpack('P', $a)[1];
+        $a = fread($fd, $size) . "\0\0\0\0\0\0\0\0";
+        return @unpack("P", $a)[1];
     }
     public static function readstr($fd, $offset = null)
     {
         if (!is_null($offset)) {
             fseek($fd, $offset);
         }
-        $str = '';
+        $str = "";
         $chr = static::read1($fd, $offset);
         while ($chr != 0) {
             $str .= chr($chr);
@@ -232,7 +231,7 @@ class IpV6wry implements IpParserInterface
     }
     public static function ip2num($ip)
     {
-        return unpack('N', inet_pton($ip))[1];
+        return unpack("N", inet_pton($ip))[1];
     }
     public static function inet_ntoa($nip)
     {

@@ -159,7 +159,7 @@ class QQwry implements IpParserInterface
             }
         }
         // 获取查找到的IP地理位置信息
-        fseek($this->fp, $findip);
+        fseek($this->fp, (int) $findip);
         $location['beginip'] = long2ip($this->getLong());
         // 用户IP所在范围的开始地址
         $offset = $this->getLong3();
