@@ -16,7 +16,7 @@ composer require hulang/think-ip
 //根据实际情况，基本上用框架(如 thinkphp,Laravel)的话不需要手动引入
 //require 'vendor/autoload.php';
 
-use think\Ip\IpLocation;
+use think\IpLocation;
 
 //0配置使用
 echo json_encode(IpLocation::getLocation($ip), JSON_UNESCAPED_UNICODE) . PHP_EOL;
@@ -55,10 +55,6 @@ echo json_encode(IpLocation::getLocation($ip, $qqwry_filepath), JSON_UNESCAPED_U
 ## 本地测试测试
 
 ```
-cd 进入 think-ip 目录 ,composer install
-
-php tests/ip.php
-
 {"ip":"172.217.25.14","country":"美国","province":"","city":"","county":"","area":"美国 Google全球边缘网络","isp":""}
 {"ip":"140.205.172.5","country":"中国","province":"上海","city":"","county":"","area":"中国上海 阿里云","isp":""}
 {"ip":"123.125.115.110","country":"中国","province":"北京","city":"","county":"","area":"中国北京 北京百度网讯科技有限公司联通节点(BGP)","isp":"联通"}
@@ -69,11 +65,7 @@ php tests/ip.php
 {"ip":"162.105.217.0","country":"中国","province":"北京","city":"","county":"","area":"中国北京 4区-4f","isp":""}
 {"ip":"fe80:0000:0001:0000:0440:44ff:1233:5678","country":"局域网","province":"","city":"","county":"","area":"局域网 本地链路单播地址","isp":""}
 {"ip":"2409:8900:103f:14f:d7e:cd36:11af:be83","country":"中国","province":"北京","city":"","county":"","area":"中国北京 中国移动CMNET网络","isp":"移动"}
-
-php tests/ip.php -i 58.196.128.0
 {"ip":"58.196.128.0","country":"中国","province":"上海","city":"","county":"","area":"中国上海 上海交通大学","isp":""}
-
-php tests/ip.php -i 2409:8a00:6c1d:81c0:51b4:d603:57d1:b5ec
 {"ip":"2409:8a00:6c1d:81c0:51b4:d603:57d1:b5ec","country":"中国","province":"北京","city":"","county":"","area":"中国北京 中国移动公众宽带","isp":"移动"}
 
 ```
