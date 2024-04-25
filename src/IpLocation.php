@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace think\Ip;
+namespace think;
 
-use think\Ip\IpParser\QQwry;
-use think\Ip\IpParser\IpV6wry;
+use think\IpParser\QQwry;
+use think\IpParser\IpV6wry;
 
 define('IP_DATABASE_ROOT_DIR', dirname(__DIR__));
 

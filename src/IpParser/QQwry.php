@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace think\Ip\IpParser;
+namespace think\IpParser;
 
 /**
  * Class IpV4
