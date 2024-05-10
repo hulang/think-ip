@@ -2,7 +2,7 @@
 
 - php >= 7.2.5
 - 修改自(https://github.com/itbdw/ip-database)
-- 纯真IP库社区版更新(2024-04-24)
+- 纯真IP库社区版更新(2024-05-08)
 
 ## 安装
 
