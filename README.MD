@@ -1,10 +1,10 @@
-### 环境
+##### 环境
 
 - php >= 7.2.5
 - 修改自(https://github.com/itbdw/ip-database)
 - 纯真IP库社区版更新(2024-05-08)
 
-## 安装
+#### 安装
 
 ```
 composer require hulang/think-ip
@@ -18,7 +18,7 @@ composer require hulang/think-ip
 
 use think\IpLocation;
 
-//0配置使用
+// 配置使用
 echo json_encode(IpLocation::getLocation($ip), JSON_UNESCAPED_UNICODE) . PHP_EOL;
 
 //支持自定义文件路径
@@ -29,7 +29,7 @@ echo json_encode(IpLocation::getLocation($ip, $qqwry_filepath), JSON_UNESCAPED_U
 
 ```
 
-## 响应
+#### 响应
 
 获取成功
 ```json
@@ -52,7 +52,7 @@ echo json_encode(IpLocation::getLocation($ip, $qqwry_filepath), JSON_UNESCAPED_U
 ```
 
 
-## 本地测试测试
+#### 本地测试测试
 
 ```
 {"ip":"172.217.25.14","country":"美国","province":"","city":"","county":"","area":"美国 Google全球边缘网络","isp":""}
@@ -70,9 +70,9 @@ echo json_encode(IpLocation::getLocation($ip, $qqwry_filepath), JSON_UNESCAPED_U
 
 ```
 
-## 感谢
-1，纯真IP库
+#### 感谢
+1.纯真IP库(纯真宣布社区版只支持到`2024年6月30日`,后续只能在纯真网`注册审核后`进行`下载`,无语了)
 
-https://www.cz88.net/help?id=free
+`https://www.cz88.com/geo-public`
 
 
