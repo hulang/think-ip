@@ -87,24 +87,24 @@ class QQwry implements IpParserInterface
     }
 
     /**
-     * 如果ip错误
-     * <code>
-     * $result 是返回的数组
-     * $result['ip']            输入的ip
-     * $result['country']       国家 如 中国
-     * $result['area']          最完整的信息 如 中国河北省邢台市威县新科网吧(北外街)
-     * </code>
-     *
-     * @param $ip
-     * @return mixed|array
+     * 根据IP地址获取对应的地理位置信息
+     * 
+     * 本函数通过读取IP数据库文件,查找给定IP地址对应的地理位置信息
+     * 如果数据库文件不存在或无法打开,将抛出异常
+     * 
+     * @param string $ip 需要查询的IP地址
+     * @return array 包含地理位置信息的数组
+     * @throws \Exception 如果无法打开IP数据库文件,则抛出异常
      */
     public function getAddr($ip)
     {
         $filename = $this->filePath;
+        // 检查IP数据库文件是否存在,如果不存在则触发错误并抛出异常
         if (!file_exists($filename)) {
             trigger_error('Failed open ip database file!');
             throw new \Exception('Failed open ip database');
         }
+        // 如果文件指针尚未初始化,则打开数据库文件并读取首尾IP地址及总IP数量
         if (is_null($this->fp)) {
             $this->fp = 0;
             if (($this->fp = fopen($filename, 'rb')) !== false) {
@@ -113,20 +113,25 @@ class QQwry implements IpParserInterface
                 $this->totalIp = ($this->lastIp - $this->firstIp) / 7;
             }
         }
+        // 根据IP地址在数据库中查找并返回对应的地理位置信息
         $location = $this->getLocation($ip);
         return $location;
     }
 
     /**
-     * 返回读取的长整型数
-     *
-     * @access private
-     * @return mixed|int
+     * 从文件读取一个4字节的长整型数值
+     * 
+     * 此私有方法用于解析二进制数据流中的长整型数值.它通过读取文件指针所指向的4个字节
+     * 并将这些字节解析为一个无符号长整型(V格式码).这种方法常用于处理二进制数据文件
+     * 如图像文件、音频文件等,其中包含了需要按字节精确读取的数值
+     * 
+     * @return int 解析出的无符号长整型数值
      */
     private function getLong()
     {
-        //将读取的little-endian编码的4个字节转化为长整型数
+        // 使用unpack函数解析4字节为一个无符号长整型
         $result = unpack('Vlong', fread($this->fp, 4));
+        // 返回解析出的长整型数值
         return $result['long'];
     }
 
