@@ -272,12 +272,10 @@ class IpV6wry implements IpParserInterface
         // 计算中间索引,并根据索引计算出文件中的偏移量
         $m = intval(($l + $r) / 2);
         $offset = static::$index_start_offset + $m * (static::$iplen + static::$offlen);
-
         // 从文件中读取中间索引对应的起始IP地址
         $m_ip1 = static::read8($fd, $offset, static::$iplen);
         // 初始化中间索引对应的结束IP地址
         $m_ip2 = 0;
-
         // 根据IP长度,处理结束IP地址的读取和位移
         if (static::$iplen <= 8) {
             $m_ip1 <<= 8 * (8 - static::$iplen);
@@ -285,7 +283,6 @@ class IpV6wry implements IpParserInterface
             $m_ip2 = static::read8($fd, $offset + 8, static::$iplen - 8);
             $m_ip2 <<= 8 * (16 - static::$iplen);
         }
-
         // 比较起始IP地址,如果小于中间索引的起始IP,则在左半部分继续查找
         if (static::uint64cmp($ip_num1, $m_ip1) < 0) {
             return static::find($fd, $ip_num1, $ip_num2, $l, $m);
@@ -294,12 +291,10 @@ class IpV6wry implements IpParserInterface
         if (static::uint64cmp($ip_num1, $m_ip1) > 0) {
             return static::find($fd, $ip_num1, $ip_num2, $m, $r);
         }
-
         // 比较结束IP地址,如果小于中间索引的结束IP,则在左半部分继续查找
         if (static::uint64cmp($ip_num2, $m_ip2) < 0) {
             return static::find($fd, $ip_num1, $ip_num2, $l, $m);
         }
-
         // 如果结束IP地址大于等于中间索引的结束IP,则在右半部分继续查找
         return static::find($fd, $ip_num1, $ip_num2, $m, $r);
     }
@@ -364,10 +359,8 @@ class IpV6wry implements IpParserInterface
         if (!is_null($offset)) {
             fseek($fd, $offset);
         }
-
         // 读取指定字节大小的数据,并在末尾添加8个零字节,用于保证解包时数据长度正确
         $a = fread($fd, $size) . "\0\0\0\0\0\0\0\0";
-
         // 使用unpack函数将读取到的数据解包为大端字节序的64位整数
         return @unpack("P", $a)[1];
     }
@@ -388,7 +381,6 @@ class IpV6wry implements IpParserInterface
         if (!is_null($offset)) {
             fseek($fd, $offset);
         }
-
         // 初始化用于存储读取字符的字符串变量
         $str = '';
         // 从文件描述符中读取一个字符,并检查是否为null字符(字符串结束标志)
