@@ -201,7 +201,6 @@ class StringParser
         $result['county'] = $location['county'];
         $result['area'] = $location['country'] . $location['province'] . $location['city'] . $location['county'] . ' ' . $location['org_area'];
         $result['isp'] = self::getIsp($result['area']);
-
         // 如果需要,返回原始数据
         if ($withOriginal) {
             $result['org'] = $org;
