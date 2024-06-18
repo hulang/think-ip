@@ -10,30 +10,6 @@ namespace think\IpParser;
  */
 class QQwry implements IpParserInterface
 {
-    public function setDBPath($filePath)
-    {
-        $this->filePath = $filePath;
-    }
-    /**
-     * @param $ip
-     * @return mixed|array
-     */
-    public function getIp($ip)
-    {
-        try {
-            $tmp = $this->getAddr($ip);
-        } catch (\Exception $exception) {
-            return [
-                'error' => $exception->getMessage(),
-            ];
-        }
-        $return = [
-            'ip' => $ip,
-            'country' => $tmp['country'],
-            'area' => $tmp['area'],
-        ];
-        return $return;
-    }
     /**
      * 文件路径
      * @var mixed|string
@@ -63,6 +39,53 @@ class QQwry implements IpParserInterface
      * @var mixed|int
      */
     private $totalIp;
+
+    /**
+     * 设置数据库文件的路径
+     * 
+     * 本函数用于设定数据库文件的存储路径.通过此路径,程序可以定位到具体的数据库文件
+     * 从而进行读取或写入操作.路径的设定对于确保数据库文件的安全存储与访问至关重要
+     * 
+     * @param string $filePath 数据库文件的路径
+     * 
+     * 此参数指定数据库文件在文件系统中的路径.路径可以是绝对路径,也可以是相对路径
+     * 如果是相对路径,则相对于当前执行脚本的目录.正确设置此路径是确保数据库文件能被
+     * 正确访问的前提
+     */
+    public function setDBPath($filePath)
+    {
+        $this->filePath = $filePath;
+    }
+
+    /**
+     * 根据IP地址获取对应的国家和地区信息
+     * 
+     * 此函数尝试通过一个IP地址来获取其对应的国家和地区信息
+     * 如果获取失败,将返回一个包含错误信息的数组
+     * 
+     * @param string $ip 需要查询的IP地址
+     * @return array|mixed 返回一个包含IP信息的数组,如果失败则返回错误信息数组
+     */
+    public function getIp($ip)
+    {
+        try {
+            // 尝试调用getAddr方法来获取IP的地址信息
+            $tmp = $this->getAddr($ip);
+        } catch (\Exception $exception) {
+            // 如果捕获到异常,返回一个包含错误信息的数组
+            return [
+                'error' => $exception->getMessage(),
+            ];
+        }
+        // 构建并返回一个包含IP、国家和地区信息的数组
+        $return = [
+            'ip' => $ip,
+            'country' => $tmp['country'],
+            'area' => $tmp['area'],
+        ];
+        return $return;
+    }
+
     /**
      * 如果ip错误
      * <code>
@@ -93,6 +116,7 @@ class QQwry implements IpParserInterface
         $location = $this->getLocation($ip);
         return $location;
     }
+
     /**
      * 返回读取的长整型数
      *
@@ -105,104 +129,87 @@ class QQwry implements IpParserInterface
         $result = unpack('Vlong', fread($this->fp, 4));
         return $result['long'];
     }
+
     /**
-     * 根据所给 IP 地址或域名返回所在地区信息
-     *
-     * @access public
-     * @param string $ip
-     * @return mixed|array ip country area beginip endip
+     * 根据IP地址获取地理位置信息
+     * 
+     * 该方法通过二分查找在IP数据库文件中定位给定IP的范围,然后解析出对应的国家和区域信息
+     * 使用了长整型和文件指针操作来处理IP数据库文件,该文件是以特定格式存储的IP范围和对应地理位置信息
+     * 
+     * @param string $ip 需要查询的IP地址
+     * @return array|null 包含IP的开始和结束地址以及国家和区域信息的数组,如果找不到则返回null
      */
     private function getLocation($ip)
     {
+        // 如果文件指针未初始化,则直接返回null
         if (!$this->fp) {
             return null;
         }
-        // 如果数据文件没有被正确打开，则直接返回空
         $location['ip'] = $ip;
         $ip = $this->packIp($location['ip']);
-        // 将输入的IP地址转化为可比较的IP地址
-        // 不合法的IP地址会被转化为255.255.255.255
-        // 对分搜索
         $l = 0;
-        // 搜索的下边界
         $u = $this->totalIp;
-        // 搜索的上边界
         $findip = $this->lastIp;
-        // 如果没有找到就返回最后一条IP记录（qqwry.dat的版本信息）
+        // 使用二分查找定位IP的范围
         while ($l <= $u) {
-            // 当上边界小于下边界时，查找失败
             $i = floor(($l + $u) / 2);
-            // 计算近似中间记录
             fseek($this->fp, intval($this->firstIp + $i * 7));
             $beginip = strrev(fread($this->fp, 4));
-            // 获取中间记录的开始IP地址
-            // strrev函数在这里的作用是将little-endian的压缩IP地址转化为big-endian的格式
-            // 以便用于比较，后面相同。
             if ($ip < $beginip) {
-                // 用户的IP小于中间记录的开始IP地址时
                 $u = $i - 1;
-                // 将搜索的上边界修改为中间记录减一
             } else {
                 fseek($this->fp, $this->getLong3());
                 $endip = strrev(fread($this->fp, 4));
-                // 获取中间记录的结束IP地址
                 if ($ip > $endip) {
-                    // 用户的IP大于中间记录的结束IP地址时
                     $l = $i + 1;
-                    // 将搜索的下边界修改为中间记录加一
                 } else {
-                    // 用户的IP在中间记录的IP范围内时
                     $findip = $this->firstIp + $i * 7;
                     break;
-                    // 则表示找到结果，退出循环
                 }
             }
         }
-        // 获取查找到的IP地理位置信息
+        // 根据找到的IP范围,读取具体的国家和区域信息
         fseek($this->fp, (int) $findip);
         $location['beginip'] = long2ip($this->getLong());
-        // 用户IP所在范围的开始地址
         $offset = $this->getLong3();
         fseek($this->fp, $offset);
         $location['endip'] = long2ip($this->getLong());
-        // 用户IP所在范围的结束地址
         $byte = fread($this->fp, 1);
-        // 标志字节
+        // 解析国家和区域信息,处理不同格式的数据
         switch (ord($byte)) {
-            case 1: // 标志字节为1，表示国家和区域信息都被同时重定向
+            case 1:
                 $countryOffset = $this->getLong3();
-                // 重定向地址
                 fseek($this->fp, $countryOffset);
                 $byte = fread($this->fp, 1);
-                // 标志字节
                 switch (ord($byte)) {
-                    case 2: // 标志字节为2，表示国家信息被重定向
+                    case 2:
                         fseek($this->fp, $this->getLong3());
                         $location['country'] = $this->getString();
                         fseek($this->fp, $countryOffset + 4);
                         $location['area'] = $this->getArea();
                         break;
-                    default: // 否则，表示国家信息没有被重定向
+                    default:
                         $location['country'] = $this->getString($byte);
                         $location['area'] = $this->getArea();
                         break;
                 }
                 break;
-            case 2: // 标志字节为2，表示国家信息被重定向
+            case 2:
                 fseek($this->fp, $this->getLong3());
                 $location['country'] = $this->getString();
                 fseek($this->fp, $offset + 8);
                 $location['area'] = $this->getArea();
                 break;
-            default: // 否则，表示国家信息没有被重定向
+            default:
                 $location['country'] = $this->getString($byte);
                 $location['area'] = $this->getArea();
                 break;
         }
+        // 将国家和区域信息从GBK编码转换为UTF-8编码
         $location['country'] = iconv('GBK', 'UTF-8', $location['country']);
         $location['area'] = iconv('GBK', 'UTF-8', $location['area']);
+        // 处理无有效数据的情况
         if ($location['country'] == ' CZ88.NET' || $location['country'] == '纯真网络') {
-            // CZ88.NET表示没有有效信息
             $location['country'] = '无数据';
         }
         if ($location['area'] == ' CZ88.NET') {
@@ -210,96 +217,136 @@ class QQwry implements IpParserInterface
         }
         return $location;
     }
+
     /**
-     * 返回压缩后可进行比较的IP地址
-     *
-     * @access private
-     * @param string $ip
-     * @return mixed|string
+     * 将IP地址打包为可用于比较的二进制格式
+     * 
+     * 此方法的目的是为了在比较IP地址时,能够忽略掉IP地址中的点分十进制格式
+     * 直接以二进制的形式进行比较,这样可以更高效地对IP地址进行排序或查找等操作
+     * 
+     * @param string $ip 需要打包的IP地址
+     * @return mixed|string 返回打包后的二进制字符串,如果IP地址无效,则返回空字符串
      */
     private function packIp($ip)
     {
-        // 将IP地址转化为长整型数，如果在PHP5中，IP地址错误，则返回False，
-        // 这时intval将Flase转化为整数-1，之后压缩成big-endian编码的字符串
+        // 将IP地址转换为长整型数字,然后将其打包为四字节的网络字节序
+        // 这里使用了pack函数,'N' 表示网络字节序（大端法）
         return pack('N', intval($this->ip2long($ip)));
     }
+
     /**
-     * Ip 地址转为数字地址
-     * php 的 ip2long 这个函数有问题
-     * 133.205.0.0 ==>> 2244804608
-     *
-     * @param string $ip 要转换的 ip 地址
-     * @return mixed|int 转换完成的数字
+     * 将IPv4地址转换为长整型数值
+     * 
+     * 由于PHP的ip2long函数在处理某些IP地址时可能存在问题,因此这里实现了自定义的转换方法
+     * 该方法通过将IP地址的每个部分转换为整型,并进行相应的位移和相加操作,来得到对应的长整型数值
+     * 这种转换对于存储和比较IP地址非常有用,特别是在需要进行数值运算的场景中
+     * 
+     * @param string $ip 要转换的IPv4地址
+     * @return int 转换后的长整型数值
      */
     private function ip2long($ip)
     {
+        // 将IP地址按点分隔成数组
         $ip_arr = explode('.', $ip);
+        // 计算IP地址的长整型数值
+        // 这里通过乘以相应的2的幂（16777216, 65536, 256）和相加,来完成每个部分的转换和拼接
         $iplong = (16777216 * intval($ip_arr[0])) + (65536 * intval($ip_arr[1])) + (256 * intval($ip_arr[2])) + intval($ip_arr[3]);
+        // 返回计算得到的长整型数值
         return $iplong;
     }
+
     /**
-     * 返回读取的3个字节的长整型数
-     *
+     * 从文件指针中读取3个字节并解析为长整型数
+     * 
+     * 由于PHP的unpack函数默认将字节序列解析为PHP的整型,此方法通过读取3个字节并附加一个零字节
+     * 来确保解析结果为32位无符号整型.这种方法用于处理特定的二进制数据格式,其中3个字节
+     * 的数值需要以特定方式解析
+     * 
      * @access private
-     * @return mixed|int
+     * @return mixed 返回解析出的32位无符号整型数,如果发生错误可能返回其他类型
      */
     private function getLong3()
     {
-        //将读取的little-endian编码的3个字节转化为长整型数
+        // 读取3个字节并附加一个零字节,用于确保解析为32位整型
         $result = unpack('Vlong', fread($this->fp, 3) . chr(0));
+        // 返回解析结果中的长整型数
         return $result['long'];
     }
+
     /**
-     * 返回读取的字符串
+     * 从文件指针中读取字符串
+     * 
+     * 该方法用于从文件指针中逐字节读取数据,直到遇到null字符为止
+     * 这种方式通常用于读取C语言风格的字符串,即以null字符结尾的字符串
      *
      * @access private
-     * @param string $data
-     * @return mixed|string
+     * @param string $data 初始字符串,用于累加读取的字符
+     * @return mixed|string 返回读取的字符串.如果文件指针已到达文件末尾或发生错误,则可能返回空字符串
      */
     private function getString($data = '')
     {
+        // 从文件指针中读取一个字节
         $char = fread($this->fp, 1);
+        // 循环直到遇到null字符（即字符串结束）
         while (ord($char) > 0) {
-            // 字符串按照C格式保存，以\0结束
+            // 将读取的字节追加到字符串中
             $data .= $char;
-            // 将读取的字符连接到给定字符串之后
+            // 读取下一个字节
             $char = fread($this->fp, 1);
         }
+        // 返回累积的字符串
         return $data;
     }
+
     /**
-     * 返回地区信息
+     * 从文件指针中读取并返回区域信息
+     *
+     * 此方法用于解析区域信息的存储格式,并根据不同的标志字节读取相应的区域信息
+     * 区域信息可能直接跟随在标志字节后,或者在文件的其他位置,需要通过跳转来获取
      *
      * @access private
-     * @return mixed|string
+     * @return mixed|string 返回读取到的区域信息,如果不存在区域信息,则返回空字符串
      */
     private function getArea()
     {
+        // 读取标志字节
         $byte = fread($this->fp, 1);
-        // 标志字节
+        // 根据标志字节的值进行不同处理
         switch (ord($byte)) {
-            case 0: // 没有区域信息
+                // 如果标志字节为0,表示没有区域信息
+            case 0:
                 $area = '';
                 break;
             case 1:
-            case 2: // 标志字节为1或2，表示区域信息被重定向
+            case 2:
+                // 标志字节为1或2,表示区域信息被重定向
+                // 跳转到指定位置并读取区域信息
                 fseek($this->fp, $this->getLong3());
                 $area = $this->getString();
                 break;
-            default: // 否则，表示区域信息没有被重定向
+            default:
+                // 如果标志字节为其他值,表示区域信息直接跟随在标志字节后
                 $area = $this->getString($byte);
                 break;
         }
         return $area;
     }
+
     /**
-     * 析构函数，用于在页面执行结束后自动关闭打开的文件。
+     * 析构函数用于在对象销毁时执行必要的操作
+     * 当页面执行结束或对象不再被使用时,PHP会自动调用析构函数
+     * 在这个析构函数中,我们检查是否存在打开的文件指针
+     * 如果存在,说明文件资源仍在使用中,此时应该关闭文件指针以释放资源
+     * 文件指针被关闭后,将其设置为0,表示没有打开的文件资源
      */
     public function __destruct()
     {
+        // 检查是否存在打开的文件指针
         if ($this->fp) {
+            // 关闭文件指针以释放资源
             fclose($this->fp);
         }
+        // 将文件指针设置为0,表示没有打开的文件
         $this->fp = 0;
     }
 }
