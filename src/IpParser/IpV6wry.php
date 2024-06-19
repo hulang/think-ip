@@ -45,22 +45,22 @@ class IpV6wry implements IpParserInterface
      */
     public function getIp($ip)
     {
+        $result = [];
+        $result['ip'] = $ip;
+        $result['code'] = 1;
+        $result['error'] = '';
         try {
             // 尝试查询给定IP的信息
             $tmp = self::query($ip);
+            $result['code'] = 0;
+            $result['country'] = $tmp['addr'][0];
+            $result['area'] = $tmp['addr'][1];
         } catch (\Exception $exception) {
             // 查询异常时,返回包含错误信息的数组
-            return [
-                'error' => $exception->getMessage(),
-            ];
+            $result['error'] = $exception->getMessage();
         }
         // 构建并返回包含IP、国家和地区信息的数组
-        $return = [
-            'ip' => $ip,
-            'country' => $tmp['addr'][0],
-            'area' => $tmp['addr'][1],
-        ];
-        return $return;
+        return $result;
     }
 
     /**

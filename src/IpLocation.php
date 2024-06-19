@@ -37,6 +37,7 @@ class IpLocation
      */
     public static function getLocationWithoutParse($ip, $ipV4Path = '', $ipV6Path = '')
     {
+        $location = [];
         // 当提供了IPv4数据库文件路径时,设置IPv4数据库路径
         if (strlen($ipV4Path)) {
             self::setIpV4Path($ipV4Path);
@@ -58,9 +59,9 @@ class IpLocation
             $location = $ins->getIp($ip);
         } else {
             // IP地址类型不被支持,返回错误信息
-            $location = [
-                'error' => 'IP Invalid'
-            ];
+            $location['ip'] = $ip;
+            $location['code'] = 1;
+            $location['error'] = 'IP Invalid';
         }
         // 返回查询结果
         return $location;
@@ -82,11 +83,12 @@ class IpLocation
         // 尝试获取原始地理位置数据,不进行任何解析
         $location = self::getLocationWithoutParse($ip, $ipV4Path, $ipV6Path);
         // 检查是否获取到了错误信息
-        if (isset($location['error'])) {
+        if ($location['code'] == 1) {
             return $location;
         }
         // 对获取到的地理位置数据进行解析和处理,以提供更友好的格式
-        return StringParser::parse($location);
+        $result = StringParser::parse($location);
+        return $result;
     }
 
     /**

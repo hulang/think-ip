@@ -91,9 +91,11 @@ class StringParser
      */
     public static function parse($location, $withOriginal = false)
     {
+        $result = [];
+        $result['code'] = 1;
+        $result['error'] = '';
         // 保存原始位置信息
         $org = $location;
-        $result = [];
         $isChina = false;
         // 定义用于地址分割的字符串
         $separatorProvince = '省';
@@ -194,6 +196,7 @@ class StringParser
             $location['country'] = '中国';
         }
         // 组装结果数组
+        $result['code'] = 0;
         $result['ip'] = $location['ip'];
         $result['country'] = $location['country'];
         $result['province'] = $location['province'];

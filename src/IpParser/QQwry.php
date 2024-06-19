@@ -68,22 +68,22 @@ class QQwry implements IpParserInterface
      */
     public function getIp($ip)
     {
+        $result = [];
+        $result['ip'] = $ip;
+        $result['code'] = 1;
+        $result['error'] = '';
         try {
-            // 尝试调用getAddr方法来获取IP的地址信息
+            // 尝试查询给定IP的信息
             $tmp = $this->getAddr($ip);
+            $result['code'] = 0;
+            $result['country'] = $tmp['country'];
+            $result['area'] = $tmp['area'];
         } catch (\Exception $exception) {
-            // 如果捕获到异常,返回一个包含错误信息的数组
-            return [
-                'error' => $exception->getMessage(),
-            ];
+            // 查询异常时,返回包含错误信息的数组
+            $result['error'] = $exception->getMessage();
         }
-        // 构建并返回一个包含IP、国家和地区信息的数组
-        $return = [
-            'ip' => $ip,
-            'country' => $tmp['country'],
-            'area' => $tmp['area'],
-        ];
-        return $return;
+        // 构建并返回包含IP、国家和地区信息的数组
+        return $result;
     }
 
     /**
