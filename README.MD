@@ -61,7 +61,7 @@ echo json_encode(IpLocation::getLocation($ip, $qqwry_filepath), JSON_UNESCAPED_U
 ```
 
 
-#### 本地测试测试
+#### 本地测试[IP]
 
 ```
 {
