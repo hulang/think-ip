@@ -40,20 +40,23 @@ echo json_encode(IpLocation::getLocation($ip, $qqwry_filepath), JSON_UNESCAPED_U
 获取成功
 ```json
 {
-  "ip": "163.177.65.160",
-  "country": "中国",
-  "province": "广东",
-  "city": "深圳市",
-  "county": "",
-  "isp": "联通",
-  "area": "中国广东省深圳市腾讯计算机系统联通节点"
+    "code": 0,
+    "error": "",
+    "ip": "163.177.65.160",
+    "country": "中国",
+    "province": "广东",
+    "city": "深圳市",
+    "county": "",
+    "area": "中国广东深圳市 联通",
+    "isp": "联通"
 }
 ```
 
 异常
 ```json
 {
-  "error": "ip invalid"
+    "code": 1,
+    "error": "ip invalid"
 }
 ```
 
@@ -61,19 +64,116 @@ echo json_encode(IpLocation::getLocation($ip, $qqwry_filepath), JSON_UNESCAPED_U
 #### 本地测试测试
 
 ```
-{"ip":"172.217.25.14","country":"美国","province":"","city":"","county":"","area":"美国 Google全球边缘网络","isp":""}
-{"ip":"140.205.172.5","country":"中国","province":"上海","city":"","county":"","area":"中国上海 阿里云","isp":""}
-{"ip":"123.125.115.110","country":"中国","province":"北京","city":"","county":"","area":"中国北京 北京百度网讯科技有限公司联通节点(BGP)","isp":"联通"}
-{"ip":"221.196.0.0","country":"中国","province":"天津","city":"河北区","county":"","area":"中国天津河北区 联通","isp":"联通"}
-{"ip":"60.195.153.98","country":"中国","province":"北京","city":"顺义区","county":"","area":"中国北京顺义区 后沙峪金龙网吧","isp":""}
-{"ip":"218.193.183.35","country":"中国","province":"上海","city":"","county":"","area":"中国上海 D27-707","isp":""}
-{"ip":"210.74.2.227","country":"中国","province":"北京","city":"","county":"","area":"中国北京 实验学院机房","isp":""}
-{"ip":"162.105.217.0","country":"中国","province":"北京","city":"","county":"","area":"中国北京 4区-4f","isp":""}
-{"ip":"fe80:0000:0001:0000:0440:44ff:1233:5678","country":"局域网","province":"","city":"","county":"","area":"局域网 本地链路单播地址","isp":""}
-{"ip":"2409:8900:103f:14f:d7e:cd36:11af:be83","country":"中国","province":"北京","city":"","county":"","area":"中国北京 中国移动CMNET网络","isp":"移动"}
-{"ip":"58.196.128.0","country":"中国","province":"上海","city":"","county":"","area":"中国上海 上海交通大学","isp":""}
-{"ip":"2409:8a00:6c1d:81c0:51b4:d603:57d1:b5ec","country":"中国","province":"北京","city":"","county":"","area":"中国北京 中国移动公众宽带","isp":"移动"}
-
+{
+    "code": 0,
+    "error": "",
+    "ip": "172.217.25.14",
+    "country": "美国",
+    "province": "",
+    "city": "",
+    "county": "",
+    "area": "美国 Google全球边缘网络",
+    "isp": ""
+}
+{
+    "code": 0,
+    "error": "",
+    "ip": "140.205.172.5",
+    "country": "中国",
+    "province": "上海",
+    "city": "",
+    "county": "",
+    "area": "中国上海 阿里云",
+    "isp": ""
+}
+{
+    "code": 0,
+    "error": "",
+    "ip": "123.125.115.110",
+    "country": "中国",
+    "province": "北京",
+    "city": "",
+    "county": "",
+    "area": "中国北京 联通\/北京百度网讯科技有限公司联通节点(BGP)",
+    "isp": "联通"
+}
+{
+    "code": 0,
+    "error": "",
+    "ip": "221.196.0.0",
+    "country": "中国",
+    "province": "天津",
+    "city": "河北区",
+    "county": "",
+    "area": "中国天津河北区 联通",
+    "isp": "联通"
+}
+{
+    "code": 0,
+    "error": "",
+    "ip": "60.195.153.98",
+    "country": "中国",
+    "province": "北京",
+    "city": "",
+    "county": "",
+    "area": "中国北京 鹏博士\/BGP",
+    "isp": ""
+}
+{
+    "code": 0,
+    "error": "",
+    "ip": "fe80:0000:0001:0000:0440:44ff:1233:5678",
+    "country": "局域网",
+    "province": "",
+    "city": "",
+    "county": "",
+    "area": "局域网 本地链路单播地址",
+    "isp": ""
+}
+{
+    "code": 0,
+    "error": "",
+    "ip": "2409:8900:103f:14f:d7e:cd36:11af:be83",
+    "country": "中国",
+    "province": "北京",
+    "city": "",
+    "county": "",
+    "area": "中国北京 中国移动CMNET网络",
+    "isp": "移动"
+}
+{
+    "code": 0,
+    "error": "",
+    "ip": "58.196.128.0",
+    "country": "中国",
+    "province": "上海",
+    "city": "",
+    "county": "",
+    "area": "中国上海 教育网\/上海交通大学",
+    "isp": ""
+}
+{
+    "code": 0,
+    "error": "",
+    "ip": "2409:8a00:6c1d:81c0:51b4:d603:57d1:b5ec",
+    "country": "中国",
+    "province": "北京",
+    "city": "",
+    "county": "",
+    "area": "中国北京 中国移动公众宽带",
+    "isp": "移动"
+}
+{
+    "code": 0,
+    "error": "",
+    "ip": "210.74.2.227",
+    "country": "中国",
+    "province": "北京",
+    "city": "",
+    "county": "",
+    "area": "中国北京 鹏博士BGP",
+    "isp": ""
+}
 ```
 
 #### 感谢
