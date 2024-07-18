@@ -86,129 +86,34 @@ class StringParser
      * 支持识别和处理中国内地的省份、城市、县/区,以及特殊情况如直辖市和无省份标识的位置
      * 
      * @param array $location 包含位置信息的数组,预期包含国家、地区和IP字段
-     * @param bool $withOriginal 是否返回原始数据,用于调试目的
-     * @return array|mixed 返回一个包含解析后位置信息的数组,如果失败则返回错误信息.如果$withOriginal为true,则还包括原始位置数据
+     * @return array|mixed 返回一个包含解析后位置信息的数组,如果失败则返回错误信息
      */
-    public static function parse($location, $withOriginal = false)
+    public static function parse($location)
     {
         $result = [];
         $result['code'] = 1;
-        $result['error'] = '';
-        // 保存原始位置信息
-        $org = $location;
-        $isChina = false;
-        // 定义用于地址分割的字符串
-        $separatorProvince = '省';
-        $separatorCity = '市';
-        $separatorCounty = '县';
-        $separatorDistrict = '区';
-        // 检查位置信息是否为空
-        if (!$location) {
-            $result['error'] = 'file open failed';
-            return $result;
+        $result['error'] = 'file open failed';
+        $result['ip'] = '';
+        $result['country'] = '';
+        $result['province'] = '';
+        $result['city'] = '';
+        $result['county'] = '';
+        $result['area'] = '';
+        $result['isp'] = '';
+        if (!empty($location)) {
+            $result['code'] = 0;
+            $result['error'] = '';
+            $result['ip'] = $location['ip'];
+            // 分割字符串
+            $arrArea = explode('–', $location['country']);
+            $strArea = str_replace('–', '', $location['country']);
+            $result['country'] = $arrArea[0];
+            $result['province'] = $arrArea[1];
+            $result['city'] = $arrArea[2];
+            $result['county'] = '';
+            $result['area'] = join(' ', [$strArea, $location['area']]);
+            $result['isp'] = self::getIsp($location['area']);
         }
-        // 移除中国前缀以处理特殊情况
-        if (strpos($location['country'], '中国') === 0) {
-            $location['country'] = str_replace('中国', '', $location['country']);
-        }
-        // 保存原始国家和地区信息
-        $location['org_country'] = $location['country'];
-        $location['org_area'] = $location['area'];
-        // 初始化地址组件
-        $location['province'] = $location['city'] = $location['county'] = '';
-        // 尝试根据省份分割国家字符串
-        $_tmp_province = explode($separatorProvince, $location['country']);
-        // 如果存在省份信息,则处理中国内地的地址
-        if (isset($_tmp_province[1])) {
-            $isChina = true;
-            $location['province'] = $_tmp_province[0];
-            // 尝试根据城市分割省份字符串
-            if (strpos($_tmp_province[1], $separatorCity) !== false) {
-                $_tmp_city = explode($separatorCity, $_tmp_province[1]);
-                $location['city'] = $_tmp_city[0] . $separatorCity;
-                // 尝试根据县/区分割城市字符串
-                if (isset($_tmp_city[1])) {
-                    if (strpos($_tmp_city[1], $separatorCounty) !== false) {
-                        $_tmp_county = explode($separatorCounty, $_tmp_city[1]);
-                        $location['county'] = $_tmp_county[0] . $separatorCounty;
-                    }
-                    // 如果没有县/区,但存在区信息,则处理区信息
-                    if (!$location['county'] && strpos($_tmp_city[1], $separatorDistrict) !== false) {
-                        $_tmp_qu = explode($separatorDistrict, $_tmp_city[1]);
-                        $location['county'] = $_tmp_qu[0] . $separatorDistrict;
-                    }
-                }
-            }
-        } else {
-            // 处理没有省份标识的位置,例如内蒙古和直辖市
-            foreach (self::$dictProvince as $key => $value) {
-                if (false !== strpos($location['country'], $value)) {
-                    $isChina = true;
-                    $location['province'] = $value;
-                    // 处理直辖市
-                    if (in_array($value, self::$dictCityDirectly)) {
-                        $_tmp_province = explode($value, $location['country']);
-                        // 市辖区
-                        if (isset($_tmp_province[1])) {
-                            $_tmp_province[1] = self::lTrim($_tmp_province[1], $separatorCity);
-                            // 处理区信息
-                            if (strpos($_tmp_province[1], $separatorDistrict) !== false) {
-                                $_tmp_qu = explode($separatorDistrict, $_tmp_province[1]);
-                                // 避免将校区、学区错误识别为城市
-                                $isHitBlackTail = false;
-                                foreach (self::$dictDistrictBlackTails as $blackTail) {
-                                    if (mb_substr($_tmp_qu[0], -mb_strlen($blackTail)) == $blackTail) {
-                                        $isHitBlackTail = true;
-                                        break;
-                                    }
-                                }
-                                if ((!$isHitBlackTail) && mb_strlen($_tmp_qu[0]) < 5) {
-                                    $location['city'] = $_tmp_qu[0] . $separatorDistrict;
-                                }
-                            }
-                        }
-                    } else {
-                        // 处理没有省份标识的其他位置
-                        $_tmp_city = str_replace($location['province'], '', $location['country']);
-                        $_tmp_city = self::lTrim($_tmp_city, $separatorCity);
-                        if (strpos($_tmp_city, $separatorCity) !== false) {
-                            $_tmp_city = explode($separatorCity, $_tmp_city);
-                            $location['city'] = $_tmp_city[0] . $separatorCity;
-                            // 处理县/区信息
-                            if (isset($_tmp_city[1])) {
-                                if (strpos($_tmp_city[1], $separatorCounty) !== false) {
-                                    $_tmp_county = explode($separatorCounty, $_tmp_city[1]);
-                                    $location['county'] = $_tmp_county[0] . $separatorCounty;
-                                }
-                                if (!$location['county'] && strpos($_tmp_city[1], $separatorDistrict) !== false) {
-                                    $_tmp_qu = explode($separatorDistrict, $_tmp_city[1]);
-                                    $location['county'] = $_tmp_qu[0] . $separatorDistrict;
-                                }
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-        // 如果解析出是中国,修正国家字段
-        if ($isChina) {
-            $location['country'] = '中国';
-        }
-        // 组装结果数组
-        $result['code'] = 0;
-        $result['ip'] = $location['ip'];
-        $result['country'] = $location['country'];
-        $result['province'] = $location['province'];
-        $result['city'] = $location['city'];
-        $result['county'] = $location['county'];
-        $result['area'] = $location['country'] . $location['province'] . $location['city'] . $location['county'] . ' ' . $location['org_area'];
-        $result['isp'] = self::getIsp($result['area']);
-        // 如果需要,返回原始数据
-        if ($withOriginal) {
-            $result['org'] = $org;
-        }
-        // 返回查询结果
         return $result;
     }
 
