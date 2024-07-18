@@ -21,65 +21,6 @@ class StringParser
     ];
 
     /**
-     * 中国直辖市
-     *
-     * @var mixed|array
-     */
-    private static $dictCityDirectly = [
-        '北京',
-        '天津',
-        '重庆',
-        '上海',
-    ];
-
-    private static $dictDistrictBlackTails = [
-        '校区',
-        '学区',
-    ];
-
-    /**
-     * 中国省份
-     *
-     * @var mixed|array
-     */
-    private static $dictProvince = [
-        '北京',
-        '天津',
-        '重庆',
-        '上海',
-        '河北',
-        '山西',
-        '辽宁',
-        '吉林',
-        '黑龙江',
-        '江苏',
-        '浙江',
-        '安徽',
-        '福建',
-        '江西',
-        '山东',
-        '河南',
-        '湖北',
-        '湖南',
-        '广东',
-        '海南',
-        '四川',
-        '贵州',
-        '云南',
-        '陕西',
-        '甘肃',
-        '青海',
-        '台湾',
-        '内蒙古',
-        '广西',
-        '宁夏',
-        '新疆',
-        '西藏',
-        '香港',
-        '澳门',
-    ];
-
-    /**
      * 解析给定的位置信息,将其分解为更详细的地址组件
      * 
      * 此函数设计用于处理来自不同来源的位置字符串,将其标准化为包含国家、省份、城市、县/区和原始区域的数组
@@ -110,6 +51,9 @@ class StringParser
             $result['country'] = $arrArea[0];
             $result['province'] = $arrArea[1];
             $result['city'] = $arrArea[2];
+            if ($arrArea[1] == $arrArea[2]) {
+                $result['city'] = '';
+            }
             $result['county'] = '';
             $result['area'] = join(' ', [$strArea, $location['area']]);
             $result['isp'] = self::getIsp($location['area']);
