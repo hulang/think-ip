@@ -42,21 +42,29 @@ class StringParser
         $result['area'] = '';
         $result['isp'] = '';
         if (!empty($location)) {
-            $result['code'] = 0;
-            $result['error'] = '';
             $result['ip'] = $location['ip'];
-            // 分割字符串
-            $arrArea = explode('–', $location['country']);
-            $strArea = str_replace('–', '', $location['country']);
-            $result['country'] = $arrArea[0];
-            $result['province'] = $arrArea[1];
-            $result['city'] = $arrArea[2];
-            if ($arrArea[1] == $arrArea[2]) {
-                $result['city'] = '';
+            // 如果是本机IP
+            if ($location['ip'] == '127.0.0.1') {
+                $result['code'] = 0;
+                $result['error'] = '';
+                $result['area'] = '本机地址';
+            } else {
+                $result['code'] = 0;
+                $result['error'] = '';
+                $result['ip'] = $location['ip'];
+                // 分割字符串
+                $arrArea = explode('–', $location['country']);
+                $strArea = str_replace('–', '', $location['country']);
+                $result['country'] = $arrArea[0];
+                $result['province'] = $arrArea[1];
+                $result['city'] = $arrArea[2];
+                if ($arrArea[1] == $arrArea[2]) {
+                    $result['city'] = '';
+                }
+                $result['county'] = '';
+                $result['area'] = join(' ', [$strArea, $location['area']]);
+                $result['isp'] = self::getIsp($location['area']);
             }
-            $result['county'] = '';
-            $result['area'] = join(' ', [$strArea, $location['area']]);
-            $result['isp'] = self::getIsp($location['area']);
         }
         return $result;
     }
