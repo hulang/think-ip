@@ -8,7 +8,7 @@
 
 - php >= 7.2.5
 - 修改自(https://github.com/itbdw/ip-database)
-- 纯真IP库社区版更新(20240612)
+- 纯真IP库社区版更新(2024-07-24)
 
 #### 安装
 
@@ -177,7 +177,7 @@ echo json_encode(IpLocation::getLocation($ip, $qqwry_filepath), JSON_UNESCAPED_U
 ```
 
 #### 感谢
-1.纯真IP库(纯真宣布社区版只支持到`2024年6月30日`,后续只能在纯真网`注册审核后`进行`下载`,无语了)
+1.纯真IP库(纯真宣布社区版只支持到`2024年6月30日`,后续只能在纯真网`注册审核后`进行`下载`,纯真网公告`2024年10月`停止下载)
 
 `https://www.cz88.com/geo-public`
 
