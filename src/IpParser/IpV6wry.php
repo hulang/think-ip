@@ -11,7 +11,7 @@ namespace think\IpParser;
 class IpV6wry implements IpParserInterface
 {
     private static $filePath;
-    const FORMAT = 'J2';
+    public const FORMAT = 'J2';
     private static $total = null;
     // 索引区
     private static $index_start_offset;
