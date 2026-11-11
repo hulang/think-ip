@@ -26,7 +26,7 @@ composer require hulang/think-ip
 
 ##### 配置
 
-编辑 `config/config.php`，集中设置默认数据源与各库路径（留空使用包内 `src/libs/` 约定路径）：
+集中设置默认数据源与各库路径（留空使用包内 `src/libs/` 约定路径）。配置模板结构如下：
 
 ```php
 return [
@@ -41,6 +41,17 @@ return [
     ],
 ];
 ```
+
+**ThinkPHP 项目**：本包 `composer.json` 通过 `extra.think.config` 声明了配置文件，安装后执行
+
+```bash
+php think vendor:publish
+```
+
+会把包内 `config/config.php` 复制为项目 `config/ip.php`，在该文件中修改路径即可（不要直接改 `vendor` 内的包文件）。已存在的 `config/ip.php` 默认不覆盖，需要强制刷新加 `--force`。
+
+配置读取优先级：框架加载的 `ip` 配置（`config('ip')`）→ 包内 `config/config.php` → 内置默认值；非框架环境自动回落包内文件，不依赖 ThinkPHP 运行。
+
 
 ```php
 
@@ -94,7 +105,7 @@ echo json_encode(IpLocation::getLocation($ip, '', '', 'qqwry'), JSON_UNESCAPED_U
 
 `test/` 目录提供标准化测试清单与基线结果：
 
-- `test/samples.json`：测试 IP 清单（标准 JSON 数组，含分类与备注），覆盖国内 v4、境外 v4、国内 v6、回环/私网/链路本地等特殊地址、非法 IP。
+- `test/samples.json`：测试 IP 清单（标准 JSON 数组，含分类与备注），覆盖国内 v4（联通/电信/移动/云厂商/公共 DNS/教育网）、境外 v4、国内 v6、境外 v6、回环/私网/链路本地等特殊地址、非法 IP。
 - `test/expected.json`：当前数据库版本下的基线结果。
 - `test/run.php`：测试脚本。
 
@@ -129,6 +140,141 @@ php test/run.php --json
         }
     },
     {
+        "ip": "210.74.2.227",
+        "category": "v4-cn-telecom",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "210.74.2.227",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 电信",
+            "isp": "电信"
+        }
+    },
+    {
+        "ip": "183.232.231.172",
+        "category": "v4-cn-mobile",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "183.232.231.172",
+            "country": "中国",
+            "province": "广东省",
+            "city": "广州市",
+            "county": "",
+            "area": "中国广东省广州市 移动",
+            "isp": "移动"
+        }
+    },
+    {
+        "ip": "140.205.172.5",
+        "category": "v4-cn-cloud",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "140.205.172.5",
+            "country": "中国",
+            "province": "上海市",
+            "city": "上海市",
+            "county": "",
+            "area": "中国上海市上海市 阿里",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "223.5.5.5",
+        "category": "v4-cn-isp-dns",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "223.5.5.5",
+            "country": "中国",
+            "province": "浙江省",
+            "city": "杭州市",
+            "county": "",
+            "area": "中国浙江省杭州市 阿里",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "119.29.29.29",
+        "category": "v4-cn-isp-dns",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "119.29.29.29",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 腾讯",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "180.76.76.76",
+        "category": "v4-cn-isp-dns",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "180.76.76.76",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 百度",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "58.196.128.0",
+        "category": "v4-cn-edu",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "58.196.128.0",
+            "country": "中国",
+            "province": "上海市",
+            "city": "上海市",
+            "county": "",
+            "area": "中国上海市上海市 中国教育网",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "114.114.114.114",
+        "category": "v4-cn-isp-dns",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "114.114.114.114",
+            "country": "中国",
+            "province": "江苏省",
+            "city": "南京市",
+            "county": "",
+            "area": "中国江苏省南京市",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "172.217.25.14",
+        "category": "v4-hk-cloud",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "172.217.25.14",
+            "country": "中国",
+            "province": "香港特别行政区",
+            "city": "",
+            "county": "",
+            "area": "中国香港特别行政区 谷歌",
+            "isp": ""
+        }
+    },
+    {
         "ip": "8.8.8.8",
         "category": "v4-overseas",
         "result": {
@@ -140,6 +286,51 @@ php test/run.php --json
             "city": "",
             "county": "",
             "area": "United StatesCalifornia Google LLC",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "1.1.1.1",
+        "category": "v4-overseas",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "1.1.1.1",
+            "country": "Australia",
+            "province": "Queensland",
+            "city": "Brisbane",
+            "county": "",
+            "area": "AustraliaQueenslandBrisbane",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "9.9.9.9",
+        "category": "v4-overseas",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "9.9.9.9",
+            "country": "United States",
+            "province": "North Carolina",
+            "city": "",
+            "county": "",
+            "area": "United StatesNorth Carolina",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "208.67.222.222",
+        "category": "v4-overseas",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "208.67.222.222",
+            "country": "United States",
+            "province": "Colorado",
+            "city": "",
+            "county": "",
+            "area": "United StatesColorado",
             "isp": ""
         }
     },
@@ -156,6 +347,126 @@ php test/run.php --json
             "county": "",
             "area": "中国北京市北京市 移动",
             "isp": "移动"
+        }
+    },
+    {
+        "ip": "2400:3200::1",
+        "category": "v6-cn-cloud",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "2400:3200::1",
+            "country": "中国",
+            "province": "浙江省",
+            "city": "杭州市",
+            "county": "",
+            "area": "中国浙江省杭州市 阿里",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "2400:3200:baba::1",
+        "category": "v6-cn-isp-dns",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "2400:3200:baba::1",
+            "country": "中国",
+            "province": "浙江省",
+            "city": "杭州市",
+            "county": "",
+            "area": "中国浙江省杭州市 阿里",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "240c::6666",
+        "category": "v6-cn-isp-dns",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "240c::6666",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 澳门科技大学",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "2402:4e00::",
+        "category": "v6-cn-mobile",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "2402:4e00::",
+            "country": "中国",
+            "province": "广东省",
+            "city": "深圳市",
+            "county": "",
+            "area": "中国广东省深圳市 腾讯",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "2001:4860:4860::8888",
+        "category": "v6-overseas",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "2001:4860:4860::8888",
+            "country": "United States",
+            "province": "Florida",
+            "city": "Miami",
+            "county": "",
+            "area": "United StatesFloridaMiami Google LLC",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "2606:4700:4700::1111",
+        "category": "v6-overseas",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "2606:4700:4700::1111",
+            "country": "United Kingdom",
+            "province": "England",
+            "city": "London",
+            "county": "",
+            "area": "United KingdomEnglandLondon Cloudflare, Inc.",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "127.0.0.1",
+        "category": "special-loopback",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "127.0.0.1",
+            "country": "",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "本机地址",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "192.168.1.1",
+        "category": "special-private",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "192.168.1.1",
+            "country": "私网地址",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "私网地址",
+            "isp": ""
         }
     },
     {

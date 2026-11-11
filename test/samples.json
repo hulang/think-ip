@@ -40,6 +40,36 @@
         "note": "国内 IPv4 · 北京 · 联通"
     },
     {
+        "ip": "119.29.29.29",
+        "category": "v4-cn-isp-dns",
+        "note": "国内 IPv4 · 公共 DNS · 腾讯"
+    },
+    {
+        "ip": "223.5.5.5",
+        "category": "v4-cn-isp-dns",
+        "note": "国内 IPv4 · 公共 DNS · 阿里"
+    },
+    {
+        "ip": "180.76.76.76",
+        "category": "v4-cn-isp-dns",
+        "note": "国内 IPv4 · 公共 DNS · 百度"
+    },
+    {
+        "ip": "183.232.231.172",
+        "category": "v4-cn-mobile",
+        "note": "国内 IPv4 · 中国移动"
+    },
+    {
+        "ip": "120.232.145.100",
+        "category": "v4-cn-mobile",
+        "note": "国内 IPv4 · 中国移动"
+    },
+    {
+        "ip": "182.61.200.6",
+        "category": "v4-cn-telecom",
+        "note": "国内 IPv4 · 中国电信段"
+    },
+    {
         "ip": "172.217.25.14",
         "category": "v4-hk-cloud",
         "note": "境外 IPv4 · 中国香港 · 谷歌"
@@ -55,6 +85,16 @@
         "note": "境外 IPv4 · 澳大利亚 · Cloudflare"
     },
     {
+        "ip": "9.9.9.9",
+        "category": "v4-overseas",
+        "note": "境外 IPv4 · 美国 · Quad9"
+    },
+    {
+        "ip": "208.67.222.222",
+        "category": "v4-overseas",
+        "note": "境外 IPv4 · 美国 · OpenDNS"
+    },
+    {
         "ip": "2409:8900:103f:14f:d7e:cd36:11af:be83",
         "category": "v6-cn-mobile",
         "note": "国内 IPv6 · 北京 · 移动"
@@ -63,6 +103,31 @@
         "ip": "2400:3200::1",
         "category": "v6-cn-cloud",
         "note": "国内 IPv6 · 浙江杭州 · 阿里云"
+    },
+    {
+        "ip": "2400:3200:baba::1",
+        "category": "v6-cn-isp-dns",
+        "note": "国内 IPv6 · 公共 DNS · 阿里"
+    },
+    {
+        "ip": "240c::6666",
+        "category": "v6-cn-isp-dns",
+        "note": "国内 IPv6 · 公共 DNS"
+    },
+    {
+        "ip": "2402:4e00::",
+        "category": "v6-cn-mobile",
+        "note": "国内 IPv6 · 移动段"
+    },
+    {
+        "ip": "2001:4860:4860::8888",
+        "category": "v6-overseas",
+        "note": "境外 IPv6 · 美国 · Google DNS"
+    },
+    {
+        "ip": "2606:4700:4700::1111",
+        "category": "v6-overseas",
+        "note": "境外 IPv6 · Cloudflare"
     },
     {
         "ip": "127.0.0.1",

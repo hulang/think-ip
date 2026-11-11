@@ -33,5 +33,12 @@
     },
     "scripts": {
         "test": "php test/run.php"
+    },
+    "extra": {
+        "think": {
+            "config": {
+                "ip": "config/config.php"
+            }
+        }
     }
 }

@@ -128,6 +128,102 @@
         }
     },
     {
+        "ip": "119.29.29.29",
+        "category": "v4-cn-isp-dns",
+        "note": "国内 IPv4 · 公共 DNS · 腾讯",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "119.29.29.29",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 腾讯",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "223.5.5.5",
+        "category": "v4-cn-isp-dns",
+        "note": "国内 IPv4 · 公共 DNS · 阿里",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "223.5.5.5",
+            "country": "中国",
+            "province": "浙江省",
+            "city": "杭州市",
+            "county": "",
+            "area": "中国浙江省杭州市 阿里",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "180.76.76.76",
+        "category": "v4-cn-isp-dns",
+        "note": "国内 IPv4 · 公共 DNS · 百度",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "180.76.76.76",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 百度",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "183.232.231.172",
+        "category": "v4-cn-mobile",
+        "note": "国内 IPv4 · 中国移动",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "183.232.231.172",
+            "country": "中国",
+            "province": "广东省",
+            "city": "广州市",
+            "county": "",
+            "area": "中国广东省广州市 移动",
+            "isp": "移动"
+        }
+    },
+    {
+        "ip": "120.232.145.100",
+        "category": "v4-cn-mobile",
+        "note": "国内 IPv4 · 中国移动",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "120.232.145.100",
+            "country": "中国",
+            "province": "广东省",
+            "city": "",
+            "county": "",
+            "area": "中国广东省 移动",
+            "isp": "移动"
+        }
+    },
+    {
+        "ip": "182.61.200.6",
+        "category": "v4-cn-telecom",
+        "note": "国内 IPv4 · 中国电信段",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "182.61.200.6",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市",
+            "isp": ""
+        }
+    },
+    {
         "ip": "172.217.25.14",
         "category": "v4-hk-cloud",
         "note": "境外 IPv4 · 中国香港 · 谷歌",
@@ -176,6 +272,38 @@
         }
     },
     {
+        "ip": "9.9.9.9",
+        "category": "v4-overseas",
+        "note": "境外 IPv4 · 美国 · Quad9",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "9.9.9.9",
+            "country": "United States",
+            "province": "North Carolina",
+            "city": "",
+            "county": "",
+            "area": "United StatesNorth Carolina",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "208.67.222.222",
+        "category": "v4-overseas",
+        "note": "境外 IPv4 · 美国 · OpenDNS",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "208.67.222.222",
+            "country": "United States",
+            "province": "Colorado",
+            "city": "",
+            "county": "",
+            "area": "United StatesColorado",
+            "isp": ""
+        }
+    },
+    {
         "ip": "2409:8900:103f:14f:d7e:cd36:11af:be83",
         "category": "v6-cn-mobile",
         "note": "国内 IPv6 · 北京 · 移动",
@@ -204,6 +332,86 @@
             "city": "杭州市",
             "county": "",
             "area": "中国浙江省杭州市 阿里",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "2400:3200:baba::1",
+        "category": "v6-cn-isp-dns",
+        "note": "国内 IPv6 · 公共 DNS · 阿里",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "2400:3200:baba::1",
+            "country": "中国",
+            "province": "浙江省",
+            "city": "杭州市",
+            "county": "",
+            "area": "中国浙江省杭州市 阿里",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "240c::6666",
+        "category": "v6-cn-isp-dns",
+        "note": "国内 IPv6 · 公共 DNS",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "240c::6666",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 澳门科技大学",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "2402:4e00::",
+        "category": "v6-cn-mobile",
+        "note": "国内 IPv6 · 移动段",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "2402:4e00::",
+            "country": "中国",
+            "province": "广东省",
+            "city": "深圳市",
+            "county": "",
+            "area": "中国广东省深圳市 腾讯",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "2001:4860:4860::8888",
+        "category": "v6-overseas",
+        "note": "境外 IPv6 · 美国 · Google DNS",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "2001:4860:4860::8888",
+            "country": "United States",
+            "province": "Florida",
+            "city": "Miami",
+            "county": "",
+            "area": "United StatesFloridaMiami Google LLC",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "2606:4700:4700::1111",
+        "category": "v6-overseas",
+        "note": "境外 IPv6 · Cloudflare",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "2606:4700:4700::1111",
+            "country": "United Kingdom",
+            "province": "England",
+            "city": "London",
+            "county": "",
+            "area": "United KingdomEnglandLondon Cloudflare, Inc.",
             "isp": ""
         }
     },

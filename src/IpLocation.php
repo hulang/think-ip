@@ -153,7 +153,11 @@ class IpLocation
     }
 
     /**
-     * 读取包内配置文件并与默认配置合并
+     * 读取配置并与默认配置合并
+     *
+     * 优先级：框架配置仓库 `ip`（ThinkPHP 等，宿主 config/ip.php 由框架加载）
+     * → 包内 config/config.php → 内置默认数组。
+     * 非框架环境不存在 config() 助手，自动回落包内文件，不硬依赖框架。
      *
      * @return array
      */
@@ -165,20 +169,60 @@ class IpLocation
         }
 
         $config = self::defaultConfig();
+
+        // 1. 包内配置文件打底
         $file = self::root('/config/config.php');
         if (is_file($file)) {
             $custom = require $file;
             if (is_array($custom)) {
-                $config = array_merge($config, $custom);
-                foreach (['ip2region', 'qqwry'] as $group) {
-                    if (isset($custom[$group]) && is_array($custom[$group])) {
-                        $config[$group] = array_merge($config[$group], $custom[$group]);
-                    }
-                }
+                $config = self::mergeConfig($config, $custom);
             }
         }
 
+        // 2. 框架配置仓库优先覆盖（ThinkPHP 等，宿主 config/ip.php 由框架加载）
+        $framework = self::readFrameworkConfig();
+        if (is_array($framework)) {
+            $config = self::mergeConfig($config, $framework);
+        }
+
         return $config;
+    }
+
+    /**
+     * 读取框架配置仓库中的 `ip` 配置（运行在框架环境时）
+     *
+     * @return array|null 非框架环境或未配置时返回 null
+     */
+    private static function readFrameworkConfig(): ?array
+    {
+        if (function_exists('config')) {
+            $cfg = @config('ip');
+            if (is_array($cfg)) {
+                return $cfg;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 合并配置：顶层键覆盖，ip2region/qqwry 分组按键合并
+     *
+     * @param array $base
+     * @param array $custom
+     * @return array
+     */
+    private static function mergeConfig(array $base, array $custom): array
+    {
+        $base = array_merge($base, $custom);
+        foreach (['ip2region', 'qqwry'] as $group) {
+            if (isset($custom[$group]) && is_array($custom[$group])) {
+                $current = isset($base[$group]) && is_array($base[$group]) ? $base[$group] : [];
+                $base[$group] = array_merge($current, $custom[$group]);
+            }
+        }
+
+        return $base;
     }
 
     /**
