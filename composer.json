@@ -1,13 +1,15 @@
 {
     "name": "hulang/think-ip",
     "type": "library",
-    "description": "IP数据库 IPV4 IPV6(解析为国家、省、市、县、运营商)",
+    "description": "IP数据库 IPV4 IPV6(内置 xdb 离线查询器,解析为国家、省、市、县、运营商)",
     "keywords": [
         "ip",
         "database",
         "location",
         "chinese",
         "china",
+        "ip2region",
+        "xdb",
         "数据库",
         "IP数据库"
     ],
@@ -28,5 +30,8 @@
         "psr-4": {
             "think\\": "src/"
         }
+    },
+    "scripts": {
+        "test": "php test/run.php"
     }
 }

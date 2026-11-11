@@ -1,0 +1,87 @@
+[
+    {
+        "ip": "163.177.65.160",
+        "category": "v4-cn-unicom",
+        "note": "国内 IPv4 · 广东深圳 · 联通"
+    },
+    {
+        "ip": "123.125.115.110",
+        "category": "v4-cn-unicom",
+        "note": "国内 IPv4 · 北京 · 联通"
+    },
+    {
+        "ip": "210.74.2.227",
+        "category": "v4-cn-telecom",
+        "note": "国内 IPv4 · 北京 · 电信"
+    },
+    {
+        "ip": "221.196.0.0",
+        "category": "v4-cn-unicom",
+        "note": "国内 IPv4 · 天津 · 联通"
+    },
+    {
+        "ip": "140.205.172.5",
+        "category": "v4-cn-cloud",
+        "note": "国内 IPv4 · 上海 · 阿里云"
+    },
+    {
+        "ip": "114.114.114.114",
+        "category": "v4-cn-isp-dns",
+        "note": "国内 IPv4 · 江苏南京 · 公共 DNS"
+    },
+    {
+        "ip": "58.196.128.0",
+        "category": "v4-cn-edu",
+        "note": "国内 IPv4 · 上海 · 教育网"
+    },
+    {
+        "ip": "60.195.153.98",
+        "category": "v4-cn-unicom",
+        "note": "国内 IPv4 · 北京 · 联通"
+    },
+    {
+        "ip": "172.217.25.14",
+        "category": "v4-hk-cloud",
+        "note": "境外 IPv4 · 中国香港 · 谷歌"
+    },
+    {
+        "ip": "8.8.8.8",
+        "category": "v4-overseas",
+        "note": "境外 IPv4 · 美国 · Google DNS"
+    },
+    {
+        "ip": "1.1.1.1",
+        "category": "v4-overseas",
+        "note": "境外 IPv4 · 澳大利亚 · Cloudflare"
+    },
+    {
+        "ip": "2409:8900:103f:14f:d7e:cd36:11af:be83",
+        "category": "v6-cn-mobile",
+        "note": "国内 IPv6 · 北京 · 移动"
+    },
+    {
+        "ip": "2400:3200::1",
+        "category": "v6-cn-cloud",
+        "note": "国内 IPv6 · 浙江杭州 · 阿里云"
+    },
+    {
+        "ip": "127.0.0.1",
+        "category": "special-loopback",
+        "note": "回环地址（本机）"
+    },
+    {
+        "ip": "192.168.1.1",
+        "category": "special-private",
+        "note": "私网地址"
+    },
+    {
+        "ip": "fe80::1",
+        "category": "special-linklocal",
+        "note": "链路本地地址"
+    },
+    {
+        "ip": "not-an-ip",
+        "category": "invalid",
+        "note": "非法 IP（应返回 code=1）"
+    }
+]

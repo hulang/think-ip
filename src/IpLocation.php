@@ -6,6 +6,8 @@ namespace think;
 
 use think\IpParser\QQwry;
 use think\IpParser\IpV6wry;
+use think\IpParser\Ip2Region;
+use think\IpParser\IpParserInterface;
 
 define('IP_DATABASE_ROOT_DIR', dirname(__DIR__));
 
@@ -23,6 +25,10 @@ class IpLocation
      * @var string IP[v6]路径
      */
     private static $ipV6Path;
+    /**
+     * @var string|null 默认数据源：ip2region（默认）/ qqwry（纯真回退）；null 时读取配置文件
+     */
+    private static $source = null;
 
     /**
      * 根据IP地址获取地理位置信息,无需解析IP类型
@@ -35,27 +41,25 @@ class IpLocation
      * @param string $ipV6Path IPv6数据库文件的路径,默认为空
      * @return mixed|array 如果查询成功,返回一个包含地理位置信息的数组;如果IP地址无效或查询失败,返回一个包含错误信息的数组
      */
-    public static function getLocationWithoutParse($ip, $ipV4Path = '', $ipV6Path = '')
+    public static function getLocationWithoutParse($ip, $ipV4Path = '', $ipV6Path = '', $source = '')
     {
-        $location = [];
-        // 当提供了IPv4数据库文件路径时,设置IPv4数据库路径
+        $source = self::resolveSource($source);
+        // 当提供了数据库文件路径时，覆盖静态路径（保持原有 setter 行为）
         if (strlen($ipV4Path)) {
             self::setIpV4Path($ipV4Path);
         }
-        // 当提供了IPv6数据库文件路径时,设置IPv6数据库路径
         if (strlen($ipV6Path)) {
             self::setIpV6Path($ipV6Path);
         }
+        $v4Path = self::$ipV4Path ?: self::defaultDbPath($source, 'v4');
+        $v6Path = self::$ipV6Path ?: self::defaultDbPath($source, 'v6');
+
         // 根据IP地址类型,使用相应的数据库查询方法
         if (self::isIpV4($ip)) {
-            // 查询IPv4地址
-            $ins = new QQwry();
-            $ins->setDBPath(self::getIpV4Path());
+            $ins = self::makeParser(false, $source, $v4Path, $v6Path);
             $location = $ins->getIp($ip);
         } else if (self::isIpV6($ip)) {
-            // 查询IPv6地址
-            $ins = new IpV6wry();
-            $ins->setDBPath(self::getIpV6Path());
+            $ins = self::makeParser(true, $source, $v4Path, $v6Path);
             $location = $ins->getIp($ip);
         } else {
             // IP地址类型不被支持,返回错误信息
@@ -65,6 +69,150 @@ class IpLocation
         }
         // 返回查询结果
         return $location;
+    }
+
+    /**
+     * 按数据源与 IP 版本创建解析器
+     *
+     * @param bool $isV6 是否 IPv6
+     * @param string $source 数据源：ip2region / qqwry
+     * @param string $v4Path IPv4 库路径
+     * @param string $v6Path IPv6 库路径
+     * @return IpParserInterface
+     */
+    protected static function makeParser($isV6, $source, $v4Path, $v6Path): IpParserInterface
+    {
+        if ($source === 'qqwry') {
+            $ins = $isV6 ? new IpV6wry() : new QQwry();
+            $ins->setDBPath($isV6 ? $v6Path : $v4Path);
+            return $ins;
+        }
+        // 默认 IP2Region，内部按 IP 版本分流 v4/v6
+        return new Ip2Region($v4Path, $v6Path);
+    }
+
+    /**
+     * 解析最终使用的数据源
+     *
+     * @param string $source 显式传入的数据源，为空时依次取静态设置、配置文件
+     * @return string
+     */
+    private static function resolveSource(string $source): string
+    {
+        if ($source !== '') {
+            return $source;
+        }
+        if (self::$source !== null) {
+            return self::$source;
+        }
+        $config = self::loadConfig();
+        return !empty($config['source']) ? $config['source'] : 'ip2region';
+    }
+
+    /**
+     * 获取指定数据源的默认数据库路径（优先配置文件，回退包内约定路径）
+     *
+     * @param string $source 数据源
+     * @param string $version v4 / v6
+     * @return string
+     */
+    private static function defaultDbPath($source, $version): string
+    {
+        $config = self::loadConfig();
+        $group = $source === 'qqwry' ? 'qqwry' : 'ip2region';
+        $configured = isset($config[$group][$version]) ? trim((string)$config[$group][$version]) : '';
+        if ($configured !== '') {
+            return self::resolvePath($configured);
+        }
+
+        if ($source === 'qqwry') {
+            $file = $version === 'v6' ? '/libs/ipv6wry.db' : '/libs/qqwry.dat';
+        } else {
+            $file = $version === 'v6' ? '/libs/ip2region_v6.xdb' : '/libs/ip2region_v4.xdb';
+        }
+        return self::src($file);
+    }
+
+    /**
+     * 解析文件路径：绝对路径原样返回，相对路径相对于包根目录
+     *
+     * @param string $path
+     * @return string
+     */
+    private static function resolvePath(string $path): string
+    {
+        $path = trim($path);
+        if ($path === '') {
+            return $path;
+        }
+        // Unix 绝对路径、Windows 盘符路径
+        if ($path[0] === '/' || $path[0] === '\\' || preg_match('/^[A-Za-z]:/', $path)) {
+            return $path;
+        }
+        return self::root('/' . ltrim($path, '/\\'));
+    }
+
+    /**
+     * 读取包内配置文件并与默认配置合并
+     *
+     * @return array
+     */
+    private static function loadConfig(): array
+    {
+        static $config = null;
+        if ($config !== null) {
+            return $config;
+        }
+
+        $config = self::defaultConfig();
+        $file = self::root('/config/config.php');
+        if (is_file($file)) {
+            $custom = require $file;
+            if (is_array($custom)) {
+                $config = array_merge($config, $custom);
+                foreach (['ip2region', 'qqwry'] as $group) {
+                    if (isset($custom[$group]) && is_array($custom[$group])) {
+                        $config[$group] = array_merge($config[$group], $custom[$group]);
+                    }
+                }
+            }
+        }
+
+        return $config;
+    }
+
+    /**
+     * 默认配置
+     *
+     * @return array
+     */
+    private static function defaultConfig(): array
+    {
+        return [
+            'source'    => 'ip2region',
+            'ip2region' => ['v4' => '', 'v6' => ''],
+            'qqwry'     => ['v4' => '', 'v6' => ''],
+        ];
+    }
+
+    /**
+     * 设置默认数据源
+     *
+     * @param string $source ip2region / qqwry
+     */
+    public static function setSource($source)
+    {
+        self::$source = $source;
+    }
+
+    /**
+     * 获取当前默认数据源
+     *
+     * @return string
+     */
+    public static function getSource()
+    {
+        return self::resolveSource('');
     }
 
     /**
@@ -78,10 +226,10 @@ class IpLocation
      * @param string $ipV6Path IPv6数据库文件的路径,为空时使用默认数据库
      * @return mixed|array 返回解析后的地理位置信息数组,如果查询失败则返回包含错误信息的数组
      */
-    public static function getLocation($ip, $ipV4Path = '', $ipV6Path = '')
+    public static function getLocation($ip, $ipV4Path = '', $ipV6Path = '', $source = '')
     {
         // 尝试获取原始地理位置数据,不进行任何解析
-        $location = self::getLocationWithoutParse($ip, $ipV4Path, $ipV6Path);
+        $location = self::getLocationWithoutParse($ip, $ipV4Path, $ipV6Path, $source);
         // 检查是否获取到了错误信息
         if ($location['code'] == 1) {
             return $location;
@@ -116,38 +264,6 @@ class IpLocation
     public static function setIpV6Path($path)
     {
         self::$ipV6Path = $path;
-    }
-
-    /**
-     * 获取IPv4地址数据库文件的路径
-     *
-     * 该方法用于确定并返回用于查询IPv4地址的数据库文件路径.如果已设置了类变量`$ipV4Path`
-     * 则直接返回该路径.否则,通过调用`self::src()`方法来指定默认的数据库文件路径
-     * 这种设计允许灵活地配置数据库文件的位置,以适应不同的部署环境或需求
-     *
-     * @return mixed|string 返回IPv4地址数据库文件的路径.路径可以是类变量`$ipV4Path`的值
-     * 或者是通过`self::src()`方法确定的默认路径
-     */
-    private static function getIpV4Path()
-    {
-        // 检查是否已设置了类变量$ipV4Path,如果未设置,则调用src方法来获取默认路径
-        return self::$ipV4Path ?: self::src('/libs/qqwry.dat');
-    }
-
-    /**
-     * 获取IPv6数据库文件的路径
-     * 
-     * 本函数用于确定并返回IPv6数据库文件的路径.如果已通过类属性$ipV6Path设置了路径
-     * 则直接返回该路径.如果没有设置,则通过调用src方法,指定默认路径来获取数据库文件路径
-     * 这样设计的目的是为了提供灵活性,允许在不同环境中配置不同的数据库文件路径
-     * 
-     * @return mixed|string 返回IPv6数据库文件的路径.路径可以是类属性$ipV6Path中直接指定的
-     * 或者是通过调用src方法动态确定的
-     */
-    private static function getIpV6Path()
-    {
-        // 检查是否已通过类属性$ipV6Path设置了IPv6数据库文件的路径
-        return self::$ipV6Path ?: self::src('/libs/ipv6wry.db');
     }
 
     /**

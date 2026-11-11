@@ -54,15 +54,12 @@ class StringParser
                 $result['ip'] = $location['ip'];
                 // 分割字符串
                 $arrArea = explode('–', $location['country']);
-                $result['country'] = $arrArea[0];
-                $result['province'] = $arrArea[1];
-                $result['city'] = '';
-                if (count($arrArea) > 2) {
-                    $result['city'] = $arrArea[2];
-                }
+                $result['country'] = $arrArea[0] ?? '';
+                $result['province'] = $arrArea[1] ?? '';
+                $result['city'] = isset($arrArea[2]) ? $arrArea[2] : '';
                 $result['county'] = '';
-                $strArea = str_replace('–', '', $location['country']);
-                $result['area'] = join(' ', [$strArea, $location['area']]);
+                $strArea = trim(str_replace('–', '', $location['country']));
+                $result['area'] = trim(join(' ', [$strArea, $location['area']]));
                 $result['isp'] = self::getIsp($location['area']);
             }
         }

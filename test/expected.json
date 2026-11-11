@@ -1,0 +1,268 @@
+[
+    {
+        "ip": "163.177.65.160",
+        "category": "v4-cn-unicom",
+        "note": "国内 IPv4 · 广东深圳 · 联通",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "163.177.65.160",
+            "country": "中国",
+            "province": "广东省",
+            "city": "深圳市",
+            "county": "",
+            "area": "中国广东省深圳市 联通",
+            "isp": "联通"
+        }
+    },
+    {
+        "ip": "123.125.115.110",
+        "category": "v4-cn-unicom",
+        "note": "国内 IPv4 · 北京 · 联通",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "123.125.115.110",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 联通",
+            "isp": "联通"
+        }
+    },
+    {
+        "ip": "210.74.2.227",
+        "category": "v4-cn-telecom",
+        "note": "国内 IPv4 · 北京 · 电信",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "210.74.2.227",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 电信",
+            "isp": "电信"
+        }
+    },
+    {
+        "ip": "221.196.0.0",
+        "category": "v4-cn-unicom",
+        "note": "国内 IPv4 · 天津 · 联通",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "221.196.0.0",
+            "country": "中国",
+            "province": "天津市",
+            "city": "天津市",
+            "county": "",
+            "area": "中国天津市天津市 联通",
+            "isp": "联通"
+        }
+    },
+    {
+        "ip": "140.205.172.5",
+        "category": "v4-cn-cloud",
+        "note": "国内 IPv4 · 上海 · 阿里云",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "140.205.172.5",
+            "country": "中国",
+            "province": "上海市",
+            "city": "上海市",
+            "county": "",
+            "area": "中国上海市上海市 阿里",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "114.114.114.114",
+        "category": "v4-cn-isp-dns",
+        "note": "国内 IPv4 · 江苏南京 · 公共 DNS",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "114.114.114.114",
+            "country": "中国",
+            "province": "江苏省",
+            "city": "南京市",
+            "county": "",
+            "area": "中国江苏省南京市",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "58.196.128.0",
+        "category": "v4-cn-edu",
+        "note": "国内 IPv4 · 上海 · 教育网",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "58.196.128.0",
+            "country": "中国",
+            "province": "上海市",
+            "city": "上海市",
+            "county": "",
+            "area": "中国上海市上海市 中国教育网",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "60.195.153.98",
+        "category": "v4-cn-unicom",
+        "note": "国内 IPv4 · 北京 · 联通",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "60.195.153.98",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 联通",
+            "isp": "联通"
+        }
+    },
+    {
+        "ip": "172.217.25.14",
+        "category": "v4-hk-cloud",
+        "note": "境外 IPv4 · 中国香港 · 谷歌",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "172.217.25.14",
+            "country": "中国",
+            "province": "香港特别行政区",
+            "city": "",
+            "county": "",
+            "area": "中国香港特别行政区 谷歌",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "8.8.8.8",
+        "category": "v4-overseas",
+        "note": "境外 IPv4 · 美国 · Google DNS",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "8.8.8.8",
+            "country": "United States",
+            "province": "California",
+            "city": "",
+            "county": "",
+            "area": "United StatesCalifornia Google LLC",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "1.1.1.1",
+        "category": "v4-overseas",
+        "note": "境外 IPv4 · 澳大利亚 · Cloudflare",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "1.1.1.1",
+            "country": "Australia",
+            "province": "Queensland",
+            "city": "Brisbane",
+            "county": "",
+            "area": "AustraliaQueenslandBrisbane",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "2409:8900:103f:14f:d7e:cd36:11af:be83",
+        "category": "v6-cn-mobile",
+        "note": "国内 IPv6 · 北京 · 移动",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "2409:8900:103f:14f:d7e:cd36:11af:be83",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 移动",
+            "isp": "移动"
+        }
+    },
+    {
+        "ip": "2400:3200::1",
+        "category": "v6-cn-cloud",
+        "note": "国内 IPv6 · 浙江杭州 · 阿里云",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "2400:3200::1",
+            "country": "中国",
+            "province": "浙江省",
+            "city": "杭州市",
+            "county": "",
+            "area": "中国浙江省杭州市 阿里",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "127.0.0.1",
+        "category": "special-loopback",
+        "note": "回环地址（本机）",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "127.0.0.1",
+            "country": "",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "本机地址",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "192.168.1.1",
+        "category": "special-private",
+        "note": "私网地址",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "192.168.1.1",
+            "country": "私网地址",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "私网地址",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "fe80::1",
+        "category": "special-linklocal",
+        "note": "链路本地地址",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "fe80::1",
+            "country": "链路本地地址",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "链路本地地址",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "not-an-ip",
+        "category": "invalid",
+        "note": "非法 IP（应返回 code=1）",
+        "result": {
+            "ip": "not-an-ip",
+            "code": 1,
+            "error": "IP Invalid"
+        }
+    }
+]

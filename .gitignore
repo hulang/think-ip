@@ -1,0 +1,12 @@
+# Composer 依赖
+/vendor/
+composer.lock
+
+# 离线 IP 数据文件（不随包分发，部署时按 config/config.php 路径自备）
+/src/libs/*.xdb
+/src/libs/*.dat
+/src/libs/*.db
+
+# 临时文件
+*.tmp
+*.cache
