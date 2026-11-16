@@ -7,7 +7,7 @@
 - php >= 7.2.5
 - 依赖扩展：`ext-mbstring`、`ext-json`、`ext-iconv`
 - 默认数据源为 IP2Region xdb 离线库（IPv4 / IPv6）
-- 保留纯真 `qqwry.dat` / `ipv6wry.db` 解析器作为可选回退数据源
+- IPv4 可切换到纯真 `qqwry.dat`；IPv6 固定使用 IP2Region，不接入纯真 `ipv6wry.db`
 
 #### 安装
 
@@ -22,7 +22,7 @@ composer require hulang/think-ip
    - IPv6：`ip2region_v6.xdb`
    - 下载地址：`https://github.com/lionsoul2014/ip2region/tree/master/data`
 2. 将文件放到 `src/libs/`（包内约定路径），或在 `config/config.php` 中配置为服务器绝对路径。
-3. 纯真回退库（可选）：自备 `qqwry.dat` / `ipv6wry.db` 并配置路径。
+3. 纯真回退库（可选，仅 IPv4）：自备 `qqwry.dat` 并在配置中填写路径；IPv6 不支持纯真库。
 
 ##### 配置
 
@@ -30,14 +30,16 @@ composer require hulang/think-ip
 
 ```php
 return [
-    'source' => 'ip2region',          // ip2region / qqwry
+    // IPv4 数据源：ip2region（默认）/ qqwry（纯真）；IPv6 固定 IP2Region
+    'source' => [
+        'v4' => 'ip2region',
+    ],
     'ip2region' => [
         'v4' => '',                   // 留空 = src/libs/ip2region_v4.xdb
         'v6' => '',                   // 留空 = src/libs/ip2region_v6.xdb
     ],
     'qqwry' => [
-        'v4' => '',
-        'v6' => '',
+        'v4' => '',                   // 纯真 IPv4 库，留空 = src/libs/qqwry.dat
     ],
 ];
 ```
@@ -68,9 +70,9 @@ $v4Path = '/abspath/ip2region_v4.xdb';
 $v6Path = '/abspath/ip2region_v6.xdb';
 echo json_encode(IpLocation::getLocation($ip, $v4Path, $v6Path), JSON_UNESCAPED_UNICODE) . PHP_EOL;
 
-// 3. 切换数据源：默认 ip2region，可切回纯真 qqwry（需自备 qqwry.dat / ipv6wry.db）
+// 3. IPv4 切换到纯真 qqwry（需自备 qqwry.dat；仅作用于 IPv4，IPv6 仍走 IP2Region）
 IpLocation::setSource('qqwry');
-// 或单次调用指定数据源（第 4 个参数）
+// 或单次调用指定 IPv4 数据源（第 4 个参数），IPv6 固定 IP2Region
 echo json_encode(IpLocation::getLocation($ip, '', '', 'qqwry'), JSON_UNESCAPED_UNICODE) . PHP_EOL;
 
 ```
@@ -108,6 +110,7 @@ echo json_encode(IpLocation::getLocation($ip, '', '', 'qqwry'), JSON_UNESCAPED_U
 - `test/samples.json`：测试 IP 清单（标准 JSON 数组，含分类与备注），覆盖国内 v4（联通/电信/移动/云厂商/公共 DNS/教育网）、境外 v4、国内 v6、境外 v6、回环/私网/链路本地等特殊地址、非法 IP。
 - `test/expected.json`：当前数据库版本下的基线结果。
 - `test/run.php`：测试脚本。
+- `test/route_check.php`：数据源路由校验（不查询真实数据库），确认 IPv4 可在 ip2region / qqwry 间切换、IPv6 固定 IP2Region。
 
 ```bash
 # 逐条运行并与基线比对，输出 PASS/FAIL（退出码 0 全部通过，1 存在不一致）
@@ -118,15 +121,24 @@ php test/run.php --update
 
 # 额外打印完整 JSON 结果数组
 php test/run.php --json
+
+# 校验数据源路由选择（IPv4 可切、IPv6 固定 IP2Region）
+php test/route_check.php
 ```
 
-代表性实测结果（标准 JSON 数组，完整清单见 `test/expected.json`；结果随数据库版本变化，仅供格式参考）：
+#### 实测结果（按数据源与 IP 版本区分）
+
+> 结果随自备数据库版本变化，仅供格式参考；完整清单见 `test/expected.json`。
+> 字段口径：IP2Region 将地区拆到 `province` / `city`，运营商放入 `area`；纯真 IPv4 不拆分省/市，地区串整体在 `country`，详细机构/运营商在 `area`。
+> IPv6 固定使用 IP2Region；纯真 `ipv6wry.db` 已弃用，不再提供 IPv6 纯真结果。
+
+##### 1. IP2Region · IPv4（19 条）
 
 ```json
 [
     {
         "ip": "163.177.65.160",
-        "category": "v4-cn-unicom",
+        "note": "国内 IPv4 · 广东深圳 · 联通",
         "result": {
             "code": 0,
             "error": "",
@@ -140,8 +152,23 @@ php test/run.php --json
         }
     },
     {
+        "ip": "123.125.115.110",
+        "note": "国内 IPv4 · 北京 · 联通",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "123.125.115.110",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 联通",
+            "isp": "联通"
+        }
+    },
+    {
         "ip": "210.74.2.227",
-        "category": "v4-cn-telecom",
+        "note": "国内 IPv4 · 北京 · 电信",
         "result": {
             "code": 0,
             "error": "",
@@ -155,23 +182,23 @@ php test/run.php --json
         }
     },
     {
-        "ip": "183.232.231.172",
-        "category": "v4-cn-mobile",
+        "ip": "221.196.0.0",
+        "note": "国内 IPv4 · 天津 · 联通",
         "result": {
             "code": 0,
             "error": "",
-            "ip": "183.232.231.172",
+            "ip": "221.196.0.0",
             "country": "中国",
-            "province": "广东省",
-            "city": "广州市",
+            "province": "天津市",
+            "city": "天津市",
             "county": "",
-            "area": "中国广东省广州市 移动",
-            "isp": "移动"
+            "area": "中国天津市天津市 联通",
+            "isp": "联通"
         }
     },
     {
         "ip": "140.205.172.5",
-        "category": "v4-cn-cloud",
+        "note": "国内 IPv4 · 上海 · 阿里云",
         "result": {
             "code": 0,
             "error": "",
@@ -185,68 +212,8 @@ php test/run.php --json
         }
     },
     {
-        "ip": "223.5.5.5",
-        "category": "v4-cn-isp-dns",
-        "result": {
-            "code": 0,
-            "error": "",
-            "ip": "223.5.5.5",
-            "country": "中国",
-            "province": "浙江省",
-            "city": "杭州市",
-            "county": "",
-            "area": "中国浙江省杭州市 阿里",
-            "isp": ""
-        }
-    },
-    {
-        "ip": "119.29.29.29",
-        "category": "v4-cn-isp-dns",
-        "result": {
-            "code": 0,
-            "error": "",
-            "ip": "119.29.29.29",
-            "country": "中国",
-            "province": "北京市",
-            "city": "北京市",
-            "county": "",
-            "area": "中国北京市北京市 腾讯",
-            "isp": ""
-        }
-    },
-    {
-        "ip": "180.76.76.76",
-        "category": "v4-cn-isp-dns",
-        "result": {
-            "code": 0,
-            "error": "",
-            "ip": "180.76.76.76",
-            "country": "中国",
-            "province": "北京市",
-            "city": "北京市",
-            "county": "",
-            "area": "中国北京市北京市 百度",
-            "isp": ""
-        }
-    },
-    {
-        "ip": "58.196.128.0",
-        "category": "v4-cn-edu",
-        "result": {
-            "code": 0,
-            "error": "",
-            "ip": "58.196.128.0",
-            "country": "中国",
-            "province": "上海市",
-            "city": "上海市",
-            "county": "",
-            "area": "中国上海市上海市 中国教育网",
-            "isp": ""
-        }
-    },
-    {
         "ip": "114.114.114.114",
-        "category": "v4-cn-isp-dns",
+        "note": "国内 IPv4 · 江苏南京 · 公共 DNS",
         "result": {
             "code": 0,
             "error": "",
@@ -260,8 +227,128 @@ php test/run.php --json
         }
     },
     {
+        "ip": "58.196.128.0",
+        "note": "国内 IPv4 · 上海 · 教育网",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "58.196.128.0",
+            "country": "中国",
+            "province": "上海市",
+            "city": "上海市",
+            "county": "",
+            "area": "中国上海市上海市 中国教育网",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "60.195.153.98",
+        "note": "国内 IPv4 · 北京 · 联通",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "60.195.153.98",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 联通",
+            "isp": "联通"
+        }
+    },
+    {
+        "ip": "119.29.29.29",
+        "note": "国内 IPv4 · 公共 DNS · 腾讯",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "119.29.29.29",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 腾讯",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "223.5.5.5",
+        "note": "国内 IPv4 · 公共 DNS · 阿里",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "223.5.5.5",
+            "country": "中国",
+            "province": "浙江省",
+            "city": "杭州市",
+            "county": "",
+            "area": "中国浙江省杭州市 阿里",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "180.76.76.76",
+        "note": "国内 IPv4 · 公共 DNS · 百度",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "180.76.76.76",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市 百度",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "183.232.231.172",
+        "note": "国内 IPv4 · 中国移动",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "183.232.231.172",
+            "country": "中国",
+            "province": "广东省",
+            "city": "广州市",
+            "county": "",
+            "area": "中国广东省广州市 移动",
+            "isp": "移动"
+        }
+    },
+    {
+        "ip": "120.232.145.100",
+        "note": "国内 IPv4 · 中国移动",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "120.232.145.100",
+            "country": "中国",
+            "province": "广东省",
+            "city": "",
+            "county": "",
+            "area": "中国广东省 移动",
+            "isp": "移动"
+        }
+    },
+    {
+        "ip": "182.61.200.6",
+        "note": "国内 IPv4 · 中国电信段",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "182.61.200.6",
+            "country": "中国",
+            "province": "北京市",
+            "city": "北京市",
+            "county": "",
+            "area": "中国北京市北京市",
+            "isp": ""
+        }
+    },
+    {
         "ip": "172.217.25.14",
-        "category": "v4-hk-cloud",
+        "note": "境外 IPv4 · 中国香港 · 谷歌",
         "result": {
             "code": 0,
             "error": "",
@@ -276,7 +363,7 @@ php test/run.php --json
     },
     {
         "ip": "8.8.8.8",
-        "category": "v4-overseas",
+        "note": "境外 IPv4 · 美国 · Google DNS",
         "result": {
             "code": 0,
             "error": "",
@@ -291,7 +378,7 @@ php test/run.php --json
     },
     {
         "ip": "1.1.1.1",
-        "category": "v4-overseas",
+        "note": "境外 IPv4 · 澳大利亚 · Cloudflare",
         "result": {
             "code": 0,
             "error": "",
@@ -306,7 +393,7 @@ php test/run.php --json
     },
     {
         "ip": "9.9.9.9",
-        "category": "v4-overseas",
+        "note": "境外 IPv4 · 美国 · Quad9",
         "result": {
             "code": 0,
             "error": "",
@@ -321,7 +408,7 @@ php test/run.php --json
     },
     {
         "ip": "208.67.222.222",
-        "category": "v4-overseas",
+        "note": "境外 IPv4 · 美国 · OpenDNS",
         "result": {
             "code": 0,
             "error": "",
@@ -333,10 +420,19 @@ php test/run.php --json
             "area": "United StatesColorado",
             "isp": ""
         }
-    },
+    }
+]
+```
+
+
+
+##### 2. IP2Region · IPv6（7 条，IPv6 仅此数据源）
+
+```json
+[
     {
         "ip": "2409:8900:103f:14f:d7e:cd36:11af:be83",
-        "category": "v6-cn-mobile",
+        "note": "国内 IPv6 · 北京 · 移动",
         "result": {
             "code": 0,
             "error": "",
@@ -351,7 +447,7 @@ php test/run.php --json
     },
     {
         "ip": "2400:3200::1",
-        "category": "v6-cn-cloud",
+        "note": "国内 IPv6 · 浙江杭州 · 阿里云",
         "result": {
             "code": 0,
             "error": "",
@@ -366,7 +462,7 @@ php test/run.php --json
     },
     {
         "ip": "2400:3200:baba::1",
-        "category": "v6-cn-isp-dns",
+        "note": "国内 IPv6 · 公共 DNS · 阿里",
         "result": {
             "code": 0,
             "error": "",
@@ -381,7 +477,7 @@ php test/run.php --json
     },
     {
         "ip": "240c::6666",
-        "category": "v6-cn-isp-dns",
+        "note": "国内 IPv6 · 公共 DNS",
         "result": {
             "code": 0,
             "error": "",
@@ -396,7 +492,7 @@ php test/run.php --json
     },
     {
         "ip": "2402:4e00::",
-        "category": "v6-cn-mobile",
+        "note": "国内 IPv6 · 移动段",
         "result": {
             "code": 0,
             "error": "",
@@ -411,7 +507,7 @@ php test/run.php --json
     },
     {
         "ip": "2001:4860:4860::8888",
-        "category": "v6-overseas",
+        "note": "境外 IPv6 · 美国 · Google DNS",
         "result": {
             "code": 0,
             "error": "",
@@ -426,7 +522,7 @@ php test/run.php --json
     },
     {
         "ip": "2606:4700:4700::1111",
-        "category": "v6-overseas",
+        "note": "境外 IPv6 · Cloudflare",
         "result": {
             "code": 0,
             "error": "",
@@ -438,59 +534,299 @@ php test/run.php --json
             "area": "United KingdomEnglandLondon Cloudflare, Inc.",
             "isp": ""
         }
-    },
+    }
+]
+```
+
+
+
+##### 3. 纯真 qqwry · IPv4（19 条，可选回退；IPv6 不支持纯真库）
+
+```json
+[
     {
-        "ip": "127.0.0.1",
-        "category": "special-loopback",
+        "ip": "163.177.65.160",
+        "note": "国内 IPv4 · 广东深圳 · 联通",
         "result": {
             "code": 0,
             "error": "",
-            "ip": "127.0.0.1",
-            "country": "",
+            "ip": "163.177.65.160",
+            "country": "广东省深圳市",
             "province": "",
             "city": "",
             "county": "",
-            "area": "本机地址",
+            "area": "广东省深圳市 联通",
+            "isp": "联通"
+        }
+    },
+    {
+        "ip": "123.125.115.110",
+        "note": "国内 IPv4 · 北京 · 联通",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "123.125.115.110",
+            "country": "北京市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "北京市 联通/北京百度网讯科技有限公司联通节点(BGP)",
+            "isp": "联通"
+        }
+    },
+    {
+        "ip": "210.74.2.227",
+        "note": "国内 IPv4 · 北京 · 电信",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "210.74.2.227",
+            "country": "北京市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "北京市 鹏博士BGP",
             "isp": ""
         }
     },
     {
-        "ip": "192.168.1.1",
-        "category": "special-private",
+        "ip": "221.196.0.0",
+        "note": "国内 IPv4 · 天津 · 联通",
         "result": {
             "code": 0,
             "error": "",
-            "ip": "192.168.1.1",
-            "country": "私网地址",
+            "ip": "221.196.0.0",
+            "country": "天津市河北区",
             "province": "",
             "city": "",
             "county": "",
-            "area": "私网地址",
+            "area": "天津市河北区 联通",
+            "isp": "联通"
+        }
+    },
+    {
+        "ip": "140.205.172.5",
+        "note": "国内 IPv4 · 上海 · 阿里云",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "140.205.172.5",
+            "country": "上海市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "上海市 阿里云",
             "isp": ""
         }
     },
     {
-        "ip": "fe80::1",
-        "category": "special-linklocal",
+        "ip": "114.114.114.114",
+        "note": "国内 IPv4 · 江苏南京 · 公共 DNS",
         "result": {
             "code": 0,
             "error": "",
-            "ip": "fe80::1",
-            "country": "链路本地地址",
+            "ip": "114.114.114.114",
+            "country": "江苏省南京市",
             "province": "",
             "city": "",
             "county": "",
-            "area": "链路本地地址",
+            "area": "江苏省南京市 南京信风网络科技有限公司GreatbitDNS服务器",
             "isp": ""
         }
     },
     {
-        "ip": "not-an-ip",
-        "category": "invalid",
+        "ip": "58.196.128.0",
+        "note": "国内 IPv4 · 上海 · 教育网",
         "result": {
-            "ip": "not-an-ip",
-            "code": 1,
-            "error": "IP Invalid"
+            "code": 0,
+            "error": "",
+            "ip": "58.196.128.0",
+            "country": "上海市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "上海市 教育网/上海交通大学",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "60.195.153.98",
+        "note": "国内 IPv4 · 北京 · 联通",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "60.195.153.98",
+            "country": "北京市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "北京市 鹏博士/BGP",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "119.29.29.29",
+        "note": "国内 IPv4 · 公共 DNS · 腾讯",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "119.29.29.29",
+            "country": "北京市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "北京市 腾讯云",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "223.5.5.5",
+        "note": "国内 IPv4 · 公共 DNS · 阿里",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "223.5.5.5",
+            "country": "浙江省杭州市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "浙江省杭州市 阿里巴巴anycast公共DNS",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "180.76.76.76",
+        "note": "国内 IPv4 · 公共 DNS · 百度",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "180.76.76.76",
+            "country": "北京市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "北京市 北京百度网讯科技有限公司公共DNS服务器(电信节点)",
+            "isp": "电信"
+        }
+    },
+    {
+        "ip": "183.232.231.172",
+        "note": "国内 IPv4 · 中国移动",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "183.232.231.172",
+            "country": "广东省广州市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "广东省广州市 移动/北京百度网讯科技有限公司移动节点",
+            "isp": "移动"
+        }
+    },
+    {
+        "ip": "120.232.145.100",
+        "note": "国内 IPv4 · 中国移动",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "120.232.145.100",
+            "country": "广东省广州市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "广东省广州市 移动",
+            "isp": "移动"
+        }
+    },
+    {
+        "ip": "182.61.200.6",
+        "note": "国内 IPv4 · 中国电信段",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "182.61.200.6",
+            "country": "北京市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "北京市 北京百度网讯科技有限公司北京BGP节点",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "172.217.25.14",
+        "note": "境外 IPv4 · 中国香港 · 谷歌",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "172.217.25.14",
+            "country": "美国",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "美国 Google全球边缘网络",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "8.8.8.8",
+        "note": "境外 IPv4 · 美国 · Google DNS",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "8.8.8.8",
+            "country": "美国加利福尼亚州圣克拉拉县山景市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "美国加利福尼亚州圣克拉拉县山景市 谷歌公司DNS服务器",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "1.1.1.1",
+        "note": "境外 IPv4 · 澳大利亚 · Cloudflare",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "1.1.1.1",
+            "country": "澳大利亚",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "澳大利亚 APNIC/CloudFlare公共DNS服务器",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "9.9.9.9",
+        "note": "境外 IPv4 · 美国 · Quad9",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "9.9.9.9",
+            "country": "美国",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "美国 Quad9(IBM)公共DNS",
+            "isp": ""
+        }
+    },
+    {
+        "ip": "208.67.222.222",
+        "note": "境外 IPv4 · 美国 · OpenDNS",
+        "result": {
+            "code": 0,
+            "error": "",
+            "ip": "208.67.222.222",
+            "country": "美国加利福尼亚州旧金山市",
+            "province": "",
+            "city": "",
+            "county": "",
+            "area": "美国加利福尼亚州旧金山市 OpenDNS有限公司公众DNS服务器",
+            "isp": ""
         }
     }
 ]
@@ -499,4 +835,4 @@ php test/run.php --json
 #### 数据源与许可
 
 1. [IP2Region](https://github.com/lionsoul2014/ip2region)：包内 xdb(v3) 查询算法精简移植自官方 PHP 绑定，代码采用 Apache-2.0 / MIT 双许可；随附或自备的 xdb 数据文件授权以官方仓库及数据来源条款为准，商用或再分发前请自行核实。
-2. 纯真 IP 库（`qqwry.dat` / `ipv6wry.db`）：仅作为可选回退解析器保留，社区版已停止更新，需自备数据文件。
+2. 纯真 IPv4 库（`qqwry.dat`）：仅作为 IPv4 可选回退解析器保留，社区版已停止更新，需自备数据文件；纯真 IPv6 库（`ipv6wry.db`）已弃用，IPv6 固定使用 IP2Region。

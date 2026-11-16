@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace think;
 
 use think\IpParser\QQwry;
-use think\IpParser\IpV6wry;
 use think\IpParser\Ip2Region;
 use think\IpParser\IpParserInterface;
 
@@ -26,7 +25,7 @@ class IpLocation
      */
     private static $ipV6Path;
     /**
-     * @var string|null 默认数据源：ip2region（默认）/ qqwry（纯真回退）；null 时读取配置文件
+     * @var string|null IPv4 默认数据源：ip2region（默认）/ qqwry（纯真回退）；null 时读取配置文件
      */
     private static $source = null;
 
@@ -43,7 +42,8 @@ class IpLocation
      */
     public static function getLocationWithoutParse($ip, $ipV4Path = '', $ipV6Path = '', $source = '')
     {
-        $source = self::resolveSource($source);
+        // 数据源策略：IPv4 可在 ip2region / qqwry 间切换；IPv6 固定 IP2Region
+        $v4Source = self::resolveV4Source($source);
         // 当提供了数据库文件路径时，覆盖静态路径（保持原有 setter 行为）
         if (strlen($ipV4Path)) {
             self::setIpV4Path($ipV4Path);
@@ -51,15 +51,16 @@ class IpLocation
         if (strlen($ipV6Path)) {
             self::setIpV6Path($ipV6Path);
         }
-        $v4Path = self::$ipV4Path ?: self::defaultDbPath($source, 'v4');
-        $v6Path = self::$ipV6Path ?: self::defaultDbPath($source, 'v6');
+        $v4Path = self::$ipV4Path ?: self::defaultDbPath($v4Source, 'v4');
+        // IPv6 固定走 IP2Region，不读取纯真 v6 库
+        $v6Path = self::$ipV6Path ?: self::defaultDbPath('ip2region', 'v6');
 
         // 根据IP地址类型,使用相应的数据库查询方法
         if (self::isIpV4($ip)) {
-            $ins = self::makeParser(false, $source, $v4Path, $v6Path);
+            $ins = self::makeV4Parser($v4Source, $v4Path);
             $location = $ins->getIp($ip);
         } else if (self::isIpV6($ip)) {
-            $ins = self::makeParser(true, $source, $v4Path, $v6Path);
+            $ins = self::makeV6Parser($v6Path);
             $location = $ins->getIp($ip);
         } else {
             // IP地址类型不被支持,返回错误信息
@@ -72,41 +73,57 @@ class IpLocation
     }
 
     /**
-     * 按数据源与 IP 版本创建解析器
+     * 按 IPv4 数据源创建解析器
      *
-     * @param bool $isV6 是否 IPv6
      * @param string $source 数据源：ip2region / qqwry
      * @param string $v4Path IPv4 库路径
-     * @param string $v6Path IPv6 库路径
      * @return IpParserInterface
      */
-    protected static function makeParser($isV6, $source, $v4Path, $v6Path): IpParserInterface
+    protected static function makeV4Parser(string $source, string $v4Path): IpParserInterface
     {
         if ($source === 'qqwry') {
-            $ins = $isV6 ? new IpV6wry() : new QQwry();
-            $ins->setDBPath($isV6 ? $v6Path : $v4Path);
+            $ins = new QQwry();
+            $ins->setDBPath($v4Path);
             return $ins;
         }
-        // 默认 IP2Region，内部按 IP 版本分流 v4/v6
-        return new Ip2Region($v4Path, $v6Path);
+        return new Ip2Region($v4Path, null);
     }
 
     /**
-     * 解析最终使用的数据源
+     * 创建 IPv6 解析器（固定 IP2Region，不接入纯真 ipv6wry.db）
      *
-     * @param string $source 显式传入的数据源，为空时依次取静态设置、配置文件
+     * @param string $v6Path IPv6 库路径
+     * @return IpParserInterface
+     */
+    protected static function makeV6Parser(string $v6Path): IpParserInterface
+    {
+        return new Ip2Region(null, $v6Path);
+    }
+
+    /**
+     * 解析 IPv4 最终使用的数据源
+     *
+     * 兼容旧版字符串 source 与新版数组 source['v4']；归一到 ip2region / qqwry。
+     *
+     * @param string|null $override 显式传入的数据源，为空时依次取静态设置、配置文件
      * @return string
      */
-    private static function resolveSource(string $source): string
+    private static function resolveV4Source(?string $override): string
     {
-        if ($source !== '') {
-            return $source;
+        if ($override !== null && $override !== '') {
+            $source = $override;
+        } elseif (self::$source !== null) {
+            $source = self::$source;
+        } else {
+            $config = self::loadConfig();
+            $source = isset($config['source']) ? $config['source'] : 'ip2region';
         }
-        if (self::$source !== null) {
-            return self::$source;
+
+        if (is_array($source)) {
+            $source = isset($source['v4']) ? $source['v4'] : 'ip2region';
         }
-        $config = self::loadConfig();
-        return !empty($config['source']) ? $config['source'] : 'ip2region';
+
+        return $source === 'qqwry' ? 'qqwry' : 'ip2region';
     }
 
     /**
@@ -126,7 +143,8 @@ class IpLocation
         }
 
         if ($source === 'qqwry') {
-            $file = $version === 'v6' ? '/libs/ipv6wry.db' : '/libs/qqwry.dat';
+            // 纯真库仅 IPv4；IPv6 不会进入此分支
+            $file = '/libs/qqwry.dat';
         } else {
             $file = $version === 'v6' ? '/libs/ip2region_v6.xdb' : '/libs/ip2region_v4.xdb';
         }
@@ -233,16 +251,16 @@ class IpLocation
     private static function defaultConfig(): array
     {
         return [
-            'source'    => 'ip2region',
+            'source'    => ['v4' => 'ip2region'],
             'ip2region' => ['v4' => '', 'v6' => ''],
-            'qqwry'     => ['v4' => '', 'v6' => ''],
+            'qqwry'     => ['v4' => ''],
         ];
     }
 
     /**
-     * 设置默认数据源
+     * 设置 IPv4 默认数据源
      *
-     * @param string $source ip2region / qqwry
+     * @param string $source ip2region / qqwry；IPv6 恒为 IP2Region，不受此设置影响
      */
     public static function setSource($source)
     {
@@ -250,13 +268,13 @@ class IpLocation
     }
 
     /**
-     * 获取当前默认数据源
+     * 获取当前 IPv4 默认数据源
      *
      * @return string
      */
     public static function getSource()
     {
-        return self::resolveSource('');
+        return self::resolveV4Source('');
     }
 
     /**

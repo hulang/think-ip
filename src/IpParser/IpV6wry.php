@@ -6,6 +6,9 @@ namespace think\IpParser;
 
 /**
  * Class IpV6wry
+ *
+ * @deprecated IPv6 已固定使用 IP2Region(xdb)，本纯真 v6 解析器不再被工厂路由调用，
+ *             仅保留源码供历史兼容参考，后续版本可能移除。
  * @package think\Ip
  */
 class IpV6wry implements IpParserInterface
